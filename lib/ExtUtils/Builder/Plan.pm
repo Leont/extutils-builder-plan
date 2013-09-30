@@ -1,5 +1,9 @@
 package ExtUtils::Builder::Plan;
-use strict;
-use warnings;
+
+use Moo;
+
+with qw/ExtUtils::Builder::Role::Dependency ExtUtils::Builder::Role::Action::Composite/;
 
 1;
+
+# ABSTRACT: An ExtUtils::Builder plan
