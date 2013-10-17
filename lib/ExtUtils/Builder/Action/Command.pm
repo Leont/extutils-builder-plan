@@ -4,7 +4,7 @@ use Moo;
 
 with 'ExtUtils::Builder::Role::Action';
 
-use IPC::System::Simple qw/systemx capturex/;
+use IPC::System::Simple qw/systemx/;
 
 sub _preference_map {
 	return {
@@ -43,12 +43,7 @@ sub _execute {
 	my ($command, $opts) = @_;
 	$opts->{logger}->(join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @{$command}) if $opts->{logger} and not $opts->{quiet};
 	if (not $opts->{dry_run}) {
-		if ($opts->{verbose}) {
-			systemx(@{$command});
-		}
-		else {
-			capturex(@{$command});
-		}
+		systemx(@{$command});
 	}
 	return;
 }
