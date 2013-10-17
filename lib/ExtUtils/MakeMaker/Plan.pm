@@ -1,15 +1,7 @@
 package ExtUtils::MakeMaker::Plan;
 
-use Exporter 5.57 'import';
-
-our @EXPORT = qw/AddPlans/;
-
-my @plans;
-
-sub AddPlans {
-	push @plans, @_;
-	return;
-}
+use strict;
+use warnings FATAL => 'all';
 
 sub escape_command {
 	my ($maker, $elements) = @_;
@@ -23,8 +15,8 @@ sub make_entry {
 }
 
 sub MY::postamble {
-	my $self = shift;
-	return join "\n\n", map { make_entry($self, $_) } @plans;
+	my ($self, %args) = @_;
+	return join "\n\n", map { make_entry($self, $_) } @{ $args{plans} || [] };
 }
 
 1;
