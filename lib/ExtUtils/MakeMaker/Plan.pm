@@ -16,7 +16,9 @@ sub make_entry {
 
 sub MY::postamble {
 	my ($self, %args) = @_;
-	return join "\n\n", map { make_entry($self, $_) } @{ $args{plans} || [] };
+	my @glue = 'pure_all :: ' . join ' ', @{ $args{roots} || [] };
+	my @plans = map { make_entry($self, $_) } @{ $args{plans} || [] };
+	return join "\n\n", @glue, @plans;
 }
 
 1;
