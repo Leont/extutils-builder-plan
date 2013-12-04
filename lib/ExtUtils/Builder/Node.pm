@@ -1,4 +1,4 @@
-package ExtUtils::Builder::Plan;
+package ExtUtils::Builder::Node;
 
 use Moo;
 
@@ -6,4 +6,4 @@ with qw/ExtUtils::Builder::Role::Dependency ExtUtils::Builder::Role::Action::Com
 
 1;
 
-# ABSTRACT: An ExtUtils::Builder plan
+# ABSTRACT: An ExtUtils::Builder node

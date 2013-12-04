@@ -9,9 +9,9 @@ sub escape_command {
 }
 
 sub make_entry {
-	my ($maker, $plan) = @_;
-	my @commands = map { escape_command($maker, $_) } $plan->to_command(perl => '$(ABSPERLRUN)');
-	return join "\n\t", $plan->target . ' : ' . join(' ', $plan->dependencies), @commands;
+	my ($maker, $node) = @_;
+	my @commands = map { escape_command($maker, $_) } $node->to_command(perl => '$(ABSPERLRUN)');
+	return join "\n\t", $node->target . ' : ' . join(' ', $node->dependencies), @commands;
 }
 
 sub MY::postamble {
