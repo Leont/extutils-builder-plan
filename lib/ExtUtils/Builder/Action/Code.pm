@@ -12,7 +12,7 @@ sub _preference_map {
 		execute => 3,
 		code    => 2,
 		command => 1,
-		flatten => 0
+		flatten => 0,
 	};
 }
 

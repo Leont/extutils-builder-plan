@@ -11,7 +11,7 @@ sub _preference_map {
 		command => 3,
 		execute => 2,
 		code    => 1,
-		flatten => 0
+		flatten => 0,
 	};
 }
 
