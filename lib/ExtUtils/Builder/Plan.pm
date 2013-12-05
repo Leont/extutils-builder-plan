@@ -56,13 +56,13 @@ around execute => sub {
 	return;
 };
 
-around flatten => sub {
-	my ($orig, $self) = @_;
+sub flatten {
+	my $self = shift;
 	my @ret;
 	my @seenloop = ({}, {});
 	$self->_node_sorter($_, sub { push @ret, $_[1]->flatten }, @seenloop) for $self->roots;
 	return @ret;
-};
+}
 
 1;
 

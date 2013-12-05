@@ -2,7 +2,7 @@ package ExtUtils::Builder::Action::Code;
 
 use Moo;
 
-with 'ExtUtils::Builder::Role::Action';
+with 'ExtUtils::Builder::Role::Action::Primitive';
 
 use Carp            ();
 use Module::Runtime ();

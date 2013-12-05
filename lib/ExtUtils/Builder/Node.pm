@@ -13,10 +13,10 @@ has _actions => (
 	},
 );
 
-around flatten => sub {
-	my ($orig, $self) = @_;
+sub flatten {
+	my $self = shift;
 	return @{ $self->_actions };
-};
+}
 
 1;
 

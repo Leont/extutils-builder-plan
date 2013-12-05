@@ -2,7 +2,7 @@ package ExtUtils::Builder::Action::Command;
 
 use Moo;
 
-with 'ExtUtils::Builder::Role::Action';
+with 'ExtUtils::Builder::Role::Action::Primitive';
 
 use IPC::System::Simple qw/systemx/;
 
