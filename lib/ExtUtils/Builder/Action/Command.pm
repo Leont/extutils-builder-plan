@@ -22,10 +22,10 @@ has _command => (
 );
 
 sub to_code {
-	my ($self, %opts) = @_;
+	my $self = shift;
 	require Data::Dumper;
-	my @dumped = Data::Dumper->new([ $self->to_command, \%opts ])->Terse(1)->Indent(0)->Dump;
-	return sprintf 'sub { my %%opts = @_; require %s; %s::_execute(%s, { %%opts, %%{%s} });', (__PACKAGE__) x 2, @dumped;
+	my $serialized = Data::Dumper->new([ $self->to_command ])->Terse(1)->Indent(0)->Dump;
+	return "sub { require IPC::System::Simple; IPC::System::Simple::systemx($serialized);";
 }
 
 sub to_command {
@@ -36,15 +36,9 @@ sub to_command {
 sub execute {
 	my ($self, %opts) = @_;
 	my @command = @{ $self->to_command };
-	return _execute(\@command, \%opts);
-}
-
-sub _execute {
-	my ($command, $opts) = @_;
-	$opts->{logger}->(join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @{$command}) if $opts->{logger} and not $opts->{quiet};
-	if (not $opts->{dry_run}) {
-		systemx(@{$command});
-	}
+	my $message = join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @command;
+	$opts{logger}->($message) if $opts{logger} and not $opts{quiet};
+	systemx(@command) if not $opts{dry_run};
 	return;
 }
 
