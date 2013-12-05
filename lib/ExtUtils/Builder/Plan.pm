@@ -1,6 +1,7 @@
 package ExtUtils::Builder::Plan;
 
 use Moo;
+use Carp ();
 
 has _nodes => (
 	is => 'ro',
@@ -29,6 +30,30 @@ sub roots {
 	my $self = shift;
 	return @{ $self->_roots };
 }
+
+sub _node_sorter {
+	my ($self, $name, $callback, $seen, $loop) = @_;
+	Carp::croak("$name has a circular dependency, aborting!\n") if exists $loop->{$name};
+	return if $seen->{$name}++;
+	my $node = $self->_nodes->{$name} or Carp::confess("Node $name doesn't exist");
+	local $loop->{$name} = 1;
+	$self->_node_sorter($_, $callback, $seen, $loop) for $node->dependencies;
+	$callback->($name, $node);
+	return;
+}
+
+sub execute {
+	my ($self, %options) = @_;
+	my @seenloop = ({}, {});
+	my $run_node = sub {
+		my ($name, $node) = @_;
+		return if -e $name and sub { -d $_ or -M $name <= -M $_ or return 0 for sort $node->dependencies; 1 }->();
+		$node->execute(%options);
+	};
+	$self->_node_sorter($_, $run_node, @seenloop) for $self->roots;
+	return;
+}
+
 
 1;
 
