@@ -62,8 +62,9 @@ sub BUILD {
 
 sub to_code {
 	my ($self, %opts) = @_;
-	my $modules = $opts{skip_loading} ? '' : join '', map { "require $_; " } @{ $self->_modules };
-	return sprintf 'sub { %s%s }', $modules, $self->serialized;
+	my @modules = $opts{skip_loading} ? () : map { "require $_; " } @{ $self->_modules };
+	my $args = %{ $self->arguments } ? 'unshift @_, ' . $self->_get_arguments . ';' : '';
+	return join '', 'sub { ', @modules, $args, $self->serialized, ' }';
 }
 
 has arguments => (
@@ -84,13 +85,17 @@ sub _get_perl {
 	return Devel::FindPerl::find_perl_interpreter($opts{config});
 }
 
+sub _get_arguments {
+	my $self = shift;
+	return if not %{ $self->arguments };
+	require Data::Dumper;
+	return (Data::Dumper->new([ $self->arguments ])->Terse(1)->Indent(0)->Dump =~ /^ \{ (.*) \} $/x)[0];
+}
+
 sub to_command {
 	my ($self, %opts) = @_;
 	my $serialized = $self->to_code(skip_loading => 1);
-	my $args = %{ $self->arguments } ? do {
-		require Data::Dumper;
-		sprintf '%%{ %s }, @ARGV', Data::Dumper->new([ $self->arguments ])->Terse(1)->Indent(0)->Dump;
-	} : '@ARGV';
+	my $args = join ', ', $self->_get_arguments, '@ARGV';
 	my $perl = _get_perl(%opts);
 	my @modules = map { "-M$_" } @{ $self->_modules };
 	return [ $perl, @modules, '-e', "($serialized)->($args)" ];
