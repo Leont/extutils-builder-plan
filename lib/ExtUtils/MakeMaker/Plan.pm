@@ -16,9 +16,10 @@ sub make_entry {
 
 sub MY::postamble {
 	my ($self, %args) = @_;
-	my @glue = 'pure_all :: ' . join ' ', @{ $args{roots} || [] };
-	my @plans = map { make_entry($self, $_) } @{ $args{plans} || [] };
-	return join "\n\n", @glue, @plans;
+	my @plans = ref $args{plans} eq 'ARRAY' ? @{ $args{plans} } : defined $args{plans} ? $args{plans} : ();
+	my @glue = 'pure_all :: ' . join ' ', map { $_->roots } @plans;
+	my @entries = map { make_entry($self, $_) } map { $_->nodes } @plans;
+	return join "\n\n", @glue, @entries;
 }
 
 1;

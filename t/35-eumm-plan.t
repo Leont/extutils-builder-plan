@@ -21,17 +21,18 @@ print $mfpl <<'END';
 use ExtUtils::MakeMaker;
 use ExtUtils::MakeMaker::Plan;
 use ExtUtils::Builder::Node;
+use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Action::Command;
 
 my $action = ExtUtils::Builder::Action::Command->new(command => ['touch', 'very_unlikely_name']);
-my $plan = ExtUtils::Builder::Node->new(actions => [ $action ], dependencies => [], target => 'foo');
+my $node = ExtUtils::Builder::Node->new(actions => [ $action ], dependencies => [], target => 'foo');
+my $plan = ExtUtils::Builder::Plan->new(nodes => [ $node ], roots => 'foo');
 
 WriteMakefile(
 	NAME => 'FOO',
 	VERSION => 0.001,
 	postamble => {
 		plans => [ $plan ],
-		roots => [ 'foo' ],
 	},
 );
 
