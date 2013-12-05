@@ -3,6 +3,8 @@ package ExtUtils::Builder::Plan;
 use Moo;
 use Carp ();
 
+with 'ExtUtils::Builder::Role::Action::Composite';
+
 has _nodes => (
 	is => 'ro',
 	init_arg => 'nodes',
@@ -42,8 +44,8 @@ sub _node_sorter {
 	return;
 }
 
-sub execute {
-	my ($self, %options) = @_;
+around execute => sub {
+	my ($orig, $self, %options) = @_;
 	my @seenloop = ({}, {});
 	my $run_node = sub {
 		my ($name, $node) = @_;
@@ -52,8 +54,15 @@ sub execute {
 	};
 	$self->_node_sorter($_, $run_node, @seenloop) for $self->roots;
 	return;
-}
+};
 
+around flatten => sub {
+	my ($orig, $self) = @_;
+	my @ret;
+	my @seenloop = ({}, {});
+	$self->_node_sorter($_, sub { push @ret, $_[1]->flatten }, @seenloop) for $self->roots;
+	return @ret;
+};
 
 1;
 

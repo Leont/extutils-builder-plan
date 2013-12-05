@@ -13,15 +13,6 @@ sub _preference_map {
 	};
 }
 
-has _actions => (
-	is       => 'ro',
-	required => 1,
-	init_arg => 'actions',
-	coerce   => sub {
-		return [ map { $_->flatten } @{ $_[0] } ];
-	},
-);
-
 sub execute {
 	my ($self, %opts) = @_;
 	$_->execute(%opts) for $self->flatten;
@@ -37,10 +28,5 @@ sub to_command {
 	my ($self, %opts) = @_;
 	return map { $_->to_command(%opts) } $self->flatten;
 }
-
-around flatten => sub {
-	my ($orig, $self) = @_;
-	return @{ $self->_actions };
-};
 
 1;
