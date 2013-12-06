@@ -102,3 +102,67 @@ sub to_command {
 }
 
 1;
+
+#ABSTRACT: An action object for perl code
+
+=head1 SYNOPSIS
+
+ my $action = ExtUtils::Builder::Action::Code->new(
+     code       => sub { Frob::nicate(@_) },
+     serialized => 'Frob::nicate(@_)',
+     message    => 'frobnicateing foo',
+     arguments  => [ source => 'foo'],
+     modules    => ['Frob'],
+ );
+ $action->execute(target => 'bar');
+ say "Executed: ", join ' ', @$_, target => 'bar' for $action->to_command;
+
+=head1 DESCRIPTION
+
+This is a primitive action object wrapping a piece of perl code. The easiest way to use it is to execute it immediately. For more information on using actions, see L<ExtUtils::Builder::Role::Action|ExtUtils::Builder::Role::Action>. The core attributes are code and serialized, though only one of them must be given, both is strongly recommended.
+
+=attr code
+
+This is a code-ref containing the action. On execution, it is passed the arguments of the execute method; when run as command it is passed @ARGV. In either case, C<arguments> is also passed. Of not given, it is C<eval>ed from C<serialized>.
+
+=attr serialized
+
+This is the stringified form of the code of the action. For execution, it's put in a sub with the action's arguments as the subs arguments. If not given, it's decompiled from C<code>.
+
+=attr arguments
+
+These are additional arguments to the action, that are passed on regardless of how the action is run. This attribute is optional.
+
+=attr modules
+
+This is an optional list of modules that will be dynamically loaded before the action is run in any way. This attribute is optional.
+
+=attr message
+
+This is a message that will be logged during execution. This attribute is optional.
+
+=method execute
+
+This executes the command immediately.
+
+=method to_code
+
+This returns the code-string for this action.
+
+=method to_command
+
+This returns an arrayref containing a command for this action.
+
+=method preference
+
+This will prefer handling methods in the following order: execute, code, command, flatten
+
+=method flatten
+
+This returns the object.
+
+=begin Pod::Coverage
+
+BUILD
+
+=end Pod::Coverage

@@ -66,4 +66,39 @@ sub flatten {
 
 1;
 
-# ABSTRACT: An ExtUtils::Builder plan
+# ABSTRACT: An ExtUtils::Builder Plan
+
+=head1 SYNOPSIS
+
+ my $plan = Frobnicate->new->plan;
+ $plan->execute;
+ say $_->target for $plan->nodes;
+ $backend->consume($plan);
+
+=head1 DESCRIPTION
+
+This module a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its <execute> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Role::Action>, but you're unlikely to want to use it like that.
+
+=attr nodes
+
+This is the set of all nodes in this plan.
+
+=attr roots
+
+This list contains one or more names of the roots of the process. This will be used as a starting point when running it.
+
+=method execute
+
+This runs the process. Similar to C<make>, it checks for each node if it is necessary to run, and if not skips it.
+
+=method flatten
+
+This flattens the plan, returning the actions in the nodes of the plan in a correct order.
+
+=method to_command
+
+Returns all commands in all actions in the nodes of the plan in a correct order.
+
+=method to_code
+
+Returns all code-strings in all actions in the nodes of the plan in a correct order.

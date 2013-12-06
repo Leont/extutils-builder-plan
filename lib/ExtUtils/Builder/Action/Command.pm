@@ -43,3 +43,40 @@ sub execute {
 }
 
 1;
+
+#ABSTRACT: An action object for external commands
+
+=head1 SYNOPSIS
+
+ my @cmd = qw/echo Hello World!/;
+ my $action = ExtUtils::Builder::Action::Command->new(command => \@cmd);
+ $action->execute;
+ say "Executed: ", join ' ', @{$_} for $action->to_command;
+
+=head1 DESCRIPTION
+
+This is a primitive action object wrapping an external command. The easiest way to use it is to serialize it to command, though it doesn't mind being executed right away. For more information on actions, see L<ExtUtils::Builder::Role::Action|ExtUtils::Builder::Role::Action>.
+
+=attr command
+
+This is the command that should be run, represented as an array ref.
+
+=method execute(%args)
+
+This executes the command immediately.
+
+=method to_command()
+
+This returns C<command>.
+
+=method to_code
+
+This returns a piece of code that will run the command.
+
+=method preference
+
+This will prefer handling methods in the following order: command, execute, code, flatten
+
+=method flatten
+
+This returns the object.
