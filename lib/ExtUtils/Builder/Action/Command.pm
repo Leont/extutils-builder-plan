@@ -33,12 +33,13 @@ sub to_command {
 	return [ @{ $self->_command } ];
 }
 
+my $quote = $^O eq 'MSWin32' ? do { require Win32::ShellQuote; \&Win32::ShellQuote::quote_system_list } : sub { @_ };
 sub execute {
 	my ($self, %opts) = @_;
 	my @command = @{ $self->to_command };
 	my $message = join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @command;
 	$opts{logger}->($message) if $opts{logger} and not $opts{quiet};
-	systemx(@command) if not $opts{dry_run};
+	systemx($quote->(@command)) if not $opts{dry_run};
 	return;
 }
 
