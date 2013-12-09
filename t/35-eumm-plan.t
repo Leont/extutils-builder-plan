@@ -18,8 +18,8 @@ chdir $tempdir;
 open my $mfpl, '>', 'Makefile.PL';
 
 print $mfpl <<'END';
+use ExtUtils::MakeMaker::Plan -global;
 use ExtUtils::MakeMaker;
-use ExtUtils::MakeMaker::Plan;
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Action::Command;
