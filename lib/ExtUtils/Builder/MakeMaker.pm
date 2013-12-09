@@ -9,6 +9,7 @@ our @EXPORT_OK = qw/postamble make_entry escape_command/;
 sub import {
 	my ($class, @args) = @_;
 	if (@args == 1 and $args[0] eq '-global') {
+		no warnings 'once';
 		*MY::postamble = \&postamble;
 	}
 	else {
@@ -22,17 +23,24 @@ sub escape_command {
 }
 
 sub make_entry {
-	my ($maker, $node) = @_;
-	my @commands = map { escape_command($maker, $_) } $node->to_command(perl => '$(ABSPERLRUN)');
-	return join "\n\t", $node->target . ' : ' . join(' ', $node->dependencies), @commands;
+	my ($maker, $target, $dependencies, $actions) = @_;
+	my @commands = map { escape_command($maker, $_) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
+	return join "\n\t", $target . ' : ' . join(' ', @{$dependencies}), @commands;
 }
 
 sub postamble {
 	my ($self, %args) = @_;
-	my @plans = ref $args{plans} eq 'ARRAY' ? @{ $args{plans} } : defined $args{plans} ? $args{plans} : ();
-	my @glue = 'pure_all :: ' . join ' ', map { $_->roots } @plans;
-	my @entries = map { make_entry($self, $_) } map { $_->nodes } @plans;
-	return join "\n\n", @glue, @entries;
+	my @ret;
+	if ($args{plans}) {
+		my @plans = ref $args{plans} eq 'ARRAY' ? @{ $args{plans} } : $args{plans};
+		push @ret, 'pure_all :: ' . join ' ', map { $_->roots } @plans;
+		push @ret, map { make_entry($self, $_->target, [ $_->dependencies ], [ $_ ]) } map { $_->nodes } @plans;
+	}
+	if($args{actions}) {
+		push @ret, 'pure_all :: extra_actions';
+		push @ret, make_entry($self, 'extra_actions', [], [ @{ $args{actions} } ]);
+	}
+	return join "\n\n", @ret;
 }
 
 1;
@@ -82,11 +90,11 @@ This usually means that you have your own postamble, which calls back this modul
 
 =func postamble($makemaker, %args)
 
-This generates a postamble for C<$makemaker> into a postamble section in the makefile from the plans in C<$args{plans}>>
+This generates a postamble for C<$makemaker> into a postamble section in the makefile from the plans in C<$args{plans}> and the actions in C<$args{actions}>.
 
-=func make_entry($makemaker, $node)
+=func make_entry($makemaker, $target, $dependencies, $actions)
 
-This takes a L<Node|ExtUtils::Builder::Node> object and turns it into a makefile entry.
+This takes a build-triplet (C<$target, $dependencies, $actions>) and formats it into a makefile entry. C<$target> is supposed to be a simple string containing the name of the target. C<$dependencies> is an array-ref of strings containing the list of dependencies. C<$actions> is supposed to be an array-ref of L<Action|ExtUtils::Builder::Role::Action> objects.
 
 =func escape_command($makemaker, $elements)
 
