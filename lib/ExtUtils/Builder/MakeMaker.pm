@@ -1,4 +1,4 @@
-package ExtUtils::MakeMaker::Plan;
+package ExtUtils::Builder::MakeMaker;
 
 use strict;
 use warnings FATAL => 'all';
@@ -42,7 +42,7 @@ sub postamble {
 =head1 SYNOPSIS
 
  use ExtUtils::MakeMaker;
- use ExtUtils::MakeMaker::Plan -global;
+ use ExtUtils::Builder::MakeMaker -global;
  ...
  my @plans = Frobnicator->new->plans;
  WriteMakeFile(
@@ -61,16 +61,16 @@ This MakeMaker extension consumes ExtUtils::Builder::Plan objects, converting th
 
 =item * Global.
 
-This can be done by giving the use statement a -global argument. This will install ExtUtils::MakeMaker::Plan's as the global postamble. This is the easiest method of using it, but is not compatible with using other postamble extensions to MakeMaker. This is equivalend to:
+This can be done by giving the use statement a -global argument. This will install ExtUtils::Builder::MakeMaker's as the global postamble. This is the easiest method of using it, but is not compatible with using other postamble extensions to MakeMaker. This is equivalend to:
 
  package MY;
- use ExtUtils::MakeMaker::Plan 'postamble';
+ use ExtUtils::Builder::MakeMaker 'postamble';
 
 =item * Non-global
 
 This usually means that you have your own postamble, which calls back this modules postambles and others, and concatenates them. For example:
 
- my @extensions = ('ExtUtils::MakeMaker::Plan', ...);
+ my @extensions = ('ExtUtils::Builder::MakeMaker', ...);
  load($_) for extensions
  my @methods = map { my $method = $extension . "::postamble" } @extensions;
  sub MY::postamble {
