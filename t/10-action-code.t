@@ -39,6 +39,7 @@ use Test::Fatal;
 	is(scalar(@serialized), 1, 'Got one command');
 	my ($command, @arguments) = @{ +shift @serialized };
 	is($command, $Config{perlpath}, "Command is $Config{perlpath}");
+	is_deeply(\@arguments, [ '-e', "sub { $args{serialized} }->(\@ARGV)" ], '');
 	is($action->to_code, "sub { $args{serialized} }", 'to_code is "sub { $input }"');
 
 	is($action->preference, 'execute', 'Prefered means is "execute"');

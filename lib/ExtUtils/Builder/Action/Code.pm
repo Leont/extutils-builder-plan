@@ -2,19 +2,8 @@ package ExtUtils::Builder::Action::Code;
 
 use Moo;
 
-with 'ExtUtils::Builder::Role::Action::Primitive';
-
 use Carp            ();
 use Module::Runtime ();
-
-sub _preference_map {
-	return {
-		execute => 3,
-		code    => 2,
-		command => 1,
-		flatten => 0,
-	};
-}
 
 my %code_cache;
 has code => (
@@ -27,18 +16,7 @@ has code => (
 	},
 );
 
-has message => (
-	is        => 'ro',
-	predicate => '_has_message',
-);
-
-sub execute {
-	my ($self, %opts) = @_;
-	Module::Runtime::require_module($_) for @{ $self->_modules };
-	$opts{logger}->($self->message) if $opts{logger} && !$opts{quiet} && $self->_has_message;
-	$self->code->(%{ $self->arguments }, %opts);
-	return;
-}
+with 'ExtUtils::Builder::Role::Action::Code';
 
 has serialized => (
 	is        => 'lazy',
@@ -67,48 +45,20 @@ sub to_code {
 	return join '', 'sub { ', @modules, $args, $self->serialized, ' }';
 }
 
-has arguments => (
-	is      => 'ro',
-	default => sub { {} },
-);
-
-has _modules => (
-	is       => 'ro',
-	init_arg => 'modules',
-	default  => sub { [] },
-);
-
-sub _get_perl {
-	my %opts = @_;
-	return $opts{perl} if $opts{perl};
-	require Devel::FindPerl;
-	return Devel::FindPerl::find_perl_interpreter($opts{config});
-}
-
-sub _get_arguments {
+sub _to_call {
 	my $self = shift;
-	return if not %{ $self->arguments };
-	require Data::Dumper;
-	return (Data::Dumper->new([ $self->arguments ])->Terse(1)->Indent(0)->Dump =~ /^ \{ (.*) \} $/x)[0];
-}
-
-sub to_command {
-	my ($self, %opts) = @_;
 	my $serialized = $self->to_code(skip_loading => 1);
-	my $args = join ', ', $self->_get_arguments, '@ARGV';
-	my $perl = _get_perl(%opts);
-	my @modules = map { "-M$_" } @{ $self->_modules };
-	return [ $perl, @modules, '-e', "($serialized)->($args)" ];
+	return $serialized =~ /\A sub\ \{ [ ] ([\w:]+) \( \@_ \) [ ] \} \z /x ? $1 : "$serialized->"
 }
 
 1;
 
-#ABSTRACT: An action object for perl code
+#ABSTRACT: Action objects for perl code
 
 =head1 SYNOPSIS
 
  my $action = ExtUtils::Builder::Action::Code->new(
-     code       => sub { Frob::nicate(@_) },
+     code       => \&Frob::nicate,
      serialized => 'Frob::nicate(@_)',
      message    => 'frobnicateing foo',
      arguments  => [ source => 'foo'],
@@ -129,37 +79,9 @@ This is a code-ref containing the action. On execution, it is passed the argumen
 
 This is the stringified form of the code of the action. For execution, it's put in a sub with the action's arguments as the subs arguments. If not given, it's decompiled from C<code>.
 
-=attr arguments
-
-These are additional arguments to the action, that are passed on regardless of how the action is run. This attribute is optional.
-
-=attr modules
-
-This is an optional list of modules that will be dynamically loaded before the action is run in any way. This attribute is optional.
-
-=attr message
-
-This is a message that will be logged during execution. This attribute is optional.
-
-=method execute
-
-This executes the command immediately.
-
 =method to_code
 
 This returns the code-string for this action.
-
-=method to_command
-
-This returns an arrayref containing a command for this action.
-
-=method preference
-
-This will prefer handling methods in the following order: execute, code, command, flatten
-
-=method flatten
-
-This returns the object.
 
 =begin Pod::Coverage
 
