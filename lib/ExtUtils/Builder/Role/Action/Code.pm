@@ -5,6 +5,8 @@ use warnings FATAL => 'all';
 
 use parent 'ExtUtils::Builder::Role::Action::Primitive';
 
+use Config;
+
 sub new { 
 	my ($class, %args) = @_;
 	$args{modules} ||= [];
@@ -44,8 +46,9 @@ sub modules {
 sub _get_perl {
 	my %opts = @_;
 	return $opts{perl} if $opts{perl};
-	require Devel::FindPerl;
-	return Devel::FindPerl::find_perl_interpreter($opts{config});
+	return eval { require Devel::FindPerl } ? Devel::FindPerl::find_perl_interpreter($opts{config}) : do {
+		File::Spec->is_absolute($^X) ? $^X : defined $opts{config} ? $opts{config}->get('perlpath') : $Config{perlpath};
+	};
 }
 
 sub to_command {
