@@ -1,31 +1,38 @@
 package ExtUtils::Builder::Action::Function;
 
-use Moo;
+use strict;
+use warnings FATAL => 'all';
+use Carp 'croak';
 
-with 'ExtUtils::Builder::Role::Action::Code';
+use parent 'ExtUtils::Builder::Role::Action::Code';
 
-has [qw/module function/] => (
-	is => 'ro',
-	required => 1,
-);
+sub new {
+	my ($class, %args) = @_;
+	croak "Attribute module is not defined" if not defined $args{module};
+	croak "Attribute function is not defined" if not defined $args{function};
+	$args{exports} ||= 0;
+	my $self = $class->SUPER::new(%args);
+	return $self;
+}
+
+for my $attr (qw/module function exports/) {
+	my $method = sub {
+		my $self = shift;
+		return $self->{$attr};
+	};
+	no strict 'refs';
+	*{$attr} = $method;
+}
 
 sub fullname {
 	my $self = shift;
 	return join '::', $self->module, $self->function;
 }
 
-has exports => (
-	is => 'ro',
-	default => 0,
-);
-
-has '+message' => (
-	lazy    => 1,
-	default => sub {
-		my $self => shift;
-		return "Calling " . $self->fullname;
-	}
-);
+sub message {
+	my $self = shift;
+	return $self->{message} ||= "Calling " . $self->fullname;
+}
 
 sub code {
 	my $self = shift;
@@ -41,7 +48,7 @@ sub _to_call {
 sub to_code {
 	my $self = shift;
 	my ($module, $fullname) = ($self->module, $self->fullname);
-	my $args = %{ $self->arguments } ? ' unshift @_, ' . $self->_get_arguments . ';' : '';
+	my $args = $self->_has_arguments ? ' unshift @_, ' . $self->_get_arguments . ';' : '';
 	return "sub { require $module;$args $fullname(\@_) }";
 }
 

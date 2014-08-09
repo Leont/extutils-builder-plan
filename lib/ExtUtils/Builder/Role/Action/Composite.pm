@@ -1,8 +1,9 @@
 package ExtUtils::Builder::Role::Action::Composite;
 
-use Moo::Role;
+use strict;
+use warnings FATAL => 'all';
 
-with 'ExtUtils::Builder::Role::Action';
+use parent 'ExtUtils::Builder::Role::Action';
 
 sub _preference_map {
 	return {

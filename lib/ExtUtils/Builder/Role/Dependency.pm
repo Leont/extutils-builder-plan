@@ -1,21 +1,21 @@
 package ExtUtils::Builder::Role::Dependency;
 
-use Moo::Role;
+use strict;
+use warnings FATAL => 'all';
 
-has target => (
-	is       => 'ro',
-	required => 1,
-);
+sub new {
+	my ($class, %args) = @_;
+	return bless \%args, $class;
+}
 
-has _dependencies => (
-	is       => 'ro',
-	required => 1,
-	init_arg => 'dependencies',
-);
+sub target {
+	my $self = shift;
+	return $self->{target};
+}
 
 sub dependencies {
 	my $self = shift;
-	return @{ $self->_dependencies };
+	return @{ $self->{dependencies} };
 }
 
 1;

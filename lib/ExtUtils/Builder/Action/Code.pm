@@ -1,47 +1,47 @@
 package ExtUtils::Builder::Action::Code;
 
-use Moo;
+use strict;
+use warnings FATAL => 'all';
+
+use parent 'ExtUtils::Builder::Role::Action::Code';
 
 use Carp            ();
 use Module::Runtime ();
 
+sub new {
+	my ($class, %args) = @_;
+	Carp::croak('Need to define at least one of code or serialized') if !$args{code} && !$args{serialized};
+	my $self = $class->SUPER::new(%args);
+	$self->{code} = $args{code} if $args{code};
+	$self->{serialized} = $args{serialized} if $args{serialized};
+	return $self;
+}
+
 my %code_cache;
-has code => (
-	is        => 'lazy',
-	predicate => '_has_code',
-	default   => sub {
+sub code {
+	my $self = shift;
+	return $self->{code} ||= do {
 		my $self = shift;
 		my $code = $self->to_code(skip_loading => 1);
-		return $code_cache{$code} ||= eval($code) || Carp::croak("Couldn't evaluate serialized: $@");
-	},
-);
+		$code_cache{$code} ||= eval($code) || Carp::croak("Couldn't evaluate serialized: $@");
+	};
+}
 
-with 'ExtUtils::Builder::Role::Action::Code';
-
-has serialized => (
-	is        => 'lazy',
-	predicate => '_has_serialized',
-	default   => sub {
-		my $self = shift;
-
+sub serialized {
+	my $self = shift;
+	return $self->{serialized} ||= do {
 		require B::Deparse;
-		my $core = B::Deparse->new('-sCi0')->coderef2text($self->code);
+		my $core = B::Deparse->new('-sCi0')->coderef2text($self->{code});
 		$core =~ s/ \A { ( .* ) } \z /$1/msx;
 		$core =~ s/ \A \n? (.*?) ;? \n? \z /$1/mx;
-		return $core;
-	},
-);
-
-sub BUILD {
-	my $self = shift;
-	Carp::croak('Need to define at least one of code or serialized') if !$self->_has_code && !$self->_has_serialized;
-	return;
+		$core;
+	};
 }
 
 sub to_code {
 	my ($self, %opts) = @_;
-	my @modules = $opts{skip_loading} ? () : map { "require $_; " } @{ $self->_modules };
-	my $args = %{ $self->arguments } ? 'unshift @_, ' . $self->_get_arguments . ';' : '';
+	my @modules = $opts{skip_loading} ? () : map { "require $_; " } $self->modules;
+	my $args = $self->_has_arguments ? 'unshift @_, ' . $self->_get_arguments . ';' : '';
 	return join '', 'sub { ', @modules, $args, $self->serialized, ' }';
 }
 
@@ -49,6 +49,11 @@ sub _to_call {
 	my $self = shift;
 	my $serialized = $self->to_code(skip_loading => 1);
 	return $serialized =~ /\A sub\ \{ [ ] ([\w:]+) \( \@_ \) [ ] \} \z /x ? $1 : "$serialized->"
+}
+
+sub message {
+	my $self = shift;
+	return $self->{message};
 }
 
 1;

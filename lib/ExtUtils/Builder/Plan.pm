@@ -1,51 +1,43 @@
 package ExtUtils::Builder::Plan;
 
-use Moo;
+use strict;
+use warnings FATAL => 'all';
+
 use Carp ();
 
-with 'ExtUtils::Builder::Role::Action::Composite';
+use parent 'ExtUtils::Builder::Role::Action::Composite';
 
-has _nodes => (
-	is => 'ro',
-	init_arg => 'nodes',
-	default => sub { [] },
-	coerce => sub {
-		return +{ map { $_->target => $_ } @{ $_[0] } };
-	}
-);
+sub new {
+	my ($class, %args) = @_;
+	Carp::croak("Attribute roots is required") if not defined $args{roots};
+	$args{roots} = [ $args{roots} ] if ref($args{roots}) ne 'ARRAY';
+	$args{nodes} = { map { $_->target => $_ } @{ $args{nodes} || [] } };
+	return $class->SUPER::new(%args);
+}
 
 sub nodes {
 	my $self = shift;
-	return values %{ $self->_nodes };
+	return values %{ $self->{nodes} };
 }
-
-has _roots => (
-	is => 'ro',
-	init_arg => 'roots',
-	required => 1,
-	coerce => sub {
-		return ref($_[0]) eq 'ARRAY' ? $_[0] : [ $_[0] ];
-	}
-);
 
 sub roots {
 	my $self = shift;
-	return @{ $self->_roots };
+	return @{ $self->{roots} };
 }
 
 sub _node_sorter {
 	my ($self, $name, $callback, $seen, $loop) = @_;
 	Carp::croak("$name has a circular dependency, aborting!\n") if exists $loop->{$name};
 	return if $seen->{$name}++;
-	my $node = $self->_nodes->{$name} or Carp::confess("Node $name doesn't exist");
+	my $node = $self->{nodes}{$name} or Carp::confess("Node $name doesn't exist");
 	local $loop->{$name} = 1;
 	$self->_node_sorter($_, $callback, $seen, $loop) for $node->dependencies;
 	$callback->($name, $node);
 	return;
 }
 
-around execute => sub {
-	my ($orig, $self, %options) = @_;
+sub execute {
+	my ($self, %options) = @_;
 	my @seenloop = ({}, {});
 	my $run_node = sub {
 		my ($name, $node) = @_;
@@ -54,7 +46,7 @@ around execute => sub {
 	};
 	$self->_node_sorter($_, $run_node, @seenloop) for $self->roots;
 	return;
-};
+}
 
 sub flatten {
 	my $self = shift;

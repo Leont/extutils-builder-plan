@@ -1,8 +1,12 @@
 package ExtUtils::Builder::Role::Action;
 
-use Moo::Role;
+use strict;
+use warnings FATAL => 'all';
 
-requires qw/_preference_map execute to_code to_command flatten/;
+sub new {
+	my ($class, %args) = @_;
+	return bless { %args }, $class;
+}
 
 sub preference {
 	my ($self, @possibilities) = @_;

@@ -1,8 +1,9 @@
 package ExtUtils::Builder::Action::Command;
 
-use Moo;
+use strict;
+use warnings FATAL => 'all';
 
-with 'ExtUtils::Builder::Role::Action::Primitive';
+use parent 'ExtUtils::Builder::Role::Action::Primitive';
 
 use IPC::System::Simple qw/systemx/;
 
@@ -15,11 +16,10 @@ sub _preference_map {
 	};
 }
 
-has _command => (
-	is       => 'ro',
-	required => 1,
-	init_arg => 'command',
-);
+sub new {
+	my ($class, %args) = @_;
+	return $class->SUPER::new(%args);
+}
 
 sub to_code {
 	my $self = shift;
@@ -30,7 +30,7 @@ sub to_code {
 
 sub to_command {
 	my $self = shift;
-	return [ @{ $self->_command } ];
+	return [ @{ $self->{command} } ];
 }
 
 my $quote = $^O eq 'MSWin32' ? do { require Win32::ShellQuote; \&Win32::ShellQuote::quote_system_list } : sub { @_ };

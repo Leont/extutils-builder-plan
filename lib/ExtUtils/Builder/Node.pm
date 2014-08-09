@@ -1,21 +1,22 @@
 package ExtUtils::Builder::Node;
 
-use Moo;
+use strict;
+use warnings FATAL => 'all';
 
-with qw/ExtUtils::Builder::Role::Dependency ExtUtils::Builder::Role::Action::Composite/;
+use parent qw/ExtUtils::Builder::Role::Action::Composite ExtUtils::Builder::Role::Dependency/;
 
-has _actions => (
-	is       => 'ro',
-	required => 1,
-	init_arg => 'actions',
-	coerce   => sub {
-		return [ map { $_->flatten } @{ $_[0] } ];
-	},
-);
+use Carp 'croak';
+
+sub new {
+	my ($class, %args) = @_;
+	croak("Attribute actions is not defined") if not $args{actions};
+	$args{actions} = [ map { $_->flatten } @{ $args{actions} } ];
+	return $class->SUPER::new(%args);
+}
 
 sub flatten {
 	my $self = shift;
-	return @{ $self->_actions };
+	return @{ $self->{actions} };
 }
 
 1;

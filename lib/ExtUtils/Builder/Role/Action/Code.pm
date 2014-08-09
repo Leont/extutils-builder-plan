@@ -1,10 +1,16 @@
 package ExtUtils::Builder::Role::Action::Code;
 
-use Moo::Role;
+use strict;
+use warnings FATAL => 'all';
 
-with 'ExtUtils::Builder::Role::Action::Primitive';
+use parent 'ExtUtils::Builder::Role::Action::Primitive';
 
-requires qw/_to_call code/;
+sub new { 
+	my ($class, %args) = @_;
+	$args{modules} ||= [];
+	$args{arguments} ||= {};
+	return $class->SUPER::new(%args);
+}
 
 sub _preference_map {
 	return {
@@ -15,40 +21,29 @@ sub _preference_map {
 	};
 }
 
-has message => (
-	is        => 'ro',
-	predicate => '_has_message',
-);
-
 sub execute {
 	my ($self, %opts) = @_;
 	Module::Runtime::require_module($_) for $self->modules;
-	$opts{logger}->($self->message) if $opts{logger} && !$opts{quiet} && $self->_has_message;
-	$self->code->(%{ $self->arguments }, %opts);
+	$opts{logger}->($self->message) if $opts{logger} && !$opts{quiet} && exists $self->{message};
+	$self->code->(%{ $self->{arguments} }, %opts);
 	return;
 }
 
-has arguments => (
-	is      => 'ro',
-	default => sub { {} },
-);
+sub _has_arguments {
+	my $self = shift;
+	return !! %{ $self->{arguments} };
+}
 
 sub _get_arguments {
 	my $self = shift;
-	return if not %{ $self->arguments };
+	return if not $self->_has_arguments;
 	require Data::Dumper;
-	return (Data::Dumper->new([ $self->arguments ])->Terse(1)->Indent(0)->Dump =~ /^ \{ (.*) \} $/x)[0];
+	return (Data::Dumper->new([ $self->{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \{ (.*) \} $/x)[0];
 }
-
-has _modules => (
-	is       => 'ro',
-	init_arg => 'modules',
-	default  => sub { [] },
-);
 
 sub modules {
 	my $self = shift;
-	return @{ $self->_modules };
+	return @{ $self->{modules} };
 }
 
 sub _get_perl {
