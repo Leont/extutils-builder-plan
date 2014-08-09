@@ -29,16 +29,11 @@ sub execute {
 	return;
 }
 
-sub _has_arguments {
-	my $self = shift;
-	return !! %{ $self->{arguments} };
-}
-
 sub _get_arguments {
-	my $self = shift;
-	return if not $self->_has_arguments;
+	my ($self, $format, $default) = @_;
+	return $default || '' if !%{ $self->{arguments} };
 	require Data::Dumper;
-	return (Data::Dumper->new([ $self->{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \{ (.*) \} $/x)[0];
+	return sprintf $format, (Data::Dumper->new([ $self->{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \{ (.*) \} $/x)[0];
 }
 
 sub modules {
@@ -56,7 +51,7 @@ sub _get_perl {
 sub to_command {
 	my ($self, %opts) = @_;
 	my @modules = map { "-M$_" } $self->modules;
-	my $args = join(', ', $self->_get_arguments, '@ARGV');
+	my $args = $self->_get_arguments('%s, @ARGV', '@ARGV');
 	return [ _get_perl(%opts), @modules, '-e', $self->_to_call() . "($args)" ];
 }
 

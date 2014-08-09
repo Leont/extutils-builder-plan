@@ -48,7 +48,7 @@ sub _to_call {
 sub to_code {
 	my $self = shift;
 	my ($module, $fullname) = ($self->module, $self->fullname);
-	my $args = $self->_has_arguments ? ' unshift @_, ' . $self->_get_arguments . ';' : '';
+	my $args =  $self->_get_arguments(' unshift @_, %s;');
 	return "sub { require $module;$args $fullname(\@_) }";
 }
 

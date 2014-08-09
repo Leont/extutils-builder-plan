@@ -41,7 +41,7 @@ sub serialized {
 sub to_code {
 	my ($self, %opts) = @_;
 	my @modules = $opts{skip_loading} ? () : map { "require $_; " } $self->modules;
-	my $args = $self->_has_arguments ? 'unshift @_, ' . $self->_get_arguments . ';' : '';
+	my $args = $self->_get_arguments('unshift @_, %s; ');
 	return join '', 'sub { ', @modules, $args, $self->serialized, ' }';
 }
 
