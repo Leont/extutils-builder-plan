@@ -79,8 +79,8 @@ This can be done by giving the use statement a -global argument. This will insta
 This usually means that you have your own postamble, which calls back this modules postambles and others, and concatenates them. For example:
 
  my @extensions = ('ExtUtils::Builder::MakeMaker', ...);
- load($_) for extensions
- my @methods = map { my $method = $extension . "::postamble" } @extensions;
+ load($_) for @extensions;
+ my @methods = map { $_. "::postamble" } @extensions;
  sub MY::postamble {
    my ($makemaker, %args) = @_;
    return join "\n\n", map { $makemaker->$_(%args) } @methods;
