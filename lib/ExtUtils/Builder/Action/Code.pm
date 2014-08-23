@@ -6,7 +6,6 @@ use warnings FATAL => 'all';
 use parent 'ExtUtils::Builder::Role::Action::Code';
 
 use Carp            ();
-use Module::Runtime ();
 
 sub new {
 	my ($class, %args) = @_;

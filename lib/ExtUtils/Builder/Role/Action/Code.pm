@@ -6,6 +6,7 @@ use warnings FATAL => 'all';
 use parent 'ExtUtils::Builder::Role::Action::Primitive';
 
 use Config;
+use Module::Load ();
 
 sub new { 
 	my ($class, %args) = @_;
@@ -25,7 +26,7 @@ sub _preference_map {
 
 sub execute {
 	my ($self, %opts) = @_;
-	Module::Runtime::require_module($_) for $self->modules;
+	Module::Load::load($_) for $self->modules;
 	$opts{logger}->($self->message) if $opts{logger} && !$opts{quiet} && exists $self->{message};
 	$self->code->(%{ $self->{arguments} }, %opts);
 	return;
