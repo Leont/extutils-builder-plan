@@ -15,6 +15,7 @@ sub import {
 	else {
 		goto &Exporter::import;
 	}
+	return;
 }
 
 sub escape_command {

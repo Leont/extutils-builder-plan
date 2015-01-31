@@ -9,7 +9,7 @@ use parent 'ExtUtils::Builder::Role::Action::Composite';
 
 sub new {
 	my ($class, %args) = @_;
-	Carp::croak("Attribute roots is required") if not defined $args{roots};
+	Carp::croak('Attribute roots is required') if not defined $args{roots};
 	$args{roots} = [ $args{roots} ] if ref($args{roots}) ne 'ARRAY';
 	$args{nodes} = { map { $_->target => $_ } @{ $args{nodes} || [] } };
 	return $class->SUPER::new(%args);
@@ -41,7 +41,7 @@ sub execute {
 	my @seenloop = ({}, {});
 	my $run_node = sub {
 		my ($name, $node) = @_;
-		return if -e $name and sub { -d $_ or -M $name <= -M $_ or return 0 for sort $node->dependencies; 1 }->();
+		return if -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
 		$node->execute(%options);
 	};
 	$self->_node_sorter($_, $run_node, @seenloop) for $self->roots;

@@ -8,8 +8,8 @@ use parent 'ExtUtils::Builder::Role::Action::Code';
 
 sub new {
 	my ($class, %args) = @_;
-	croak "Attribute module is not defined" if not defined $args{module};
-	croak "Attribute function is not defined" if not defined $args{function};
+	croak 'Attribute module is not defined' if not defined $args{module};
+	croak 'Attribute function is not defined' if not defined $args{function};
 	$args{exports} ||= 0;
 	my $self = $class->SUPER::new(%args);
 	return $self;
@@ -31,7 +31,7 @@ sub fullname {
 
 sub message {
 	my $self = shift;
-	return $self->{message} ||= "Calling " . $self->fullname;
+	return $self->{message} ||= 'Calling ' . $self->fullname;
 }
 
 sub code {

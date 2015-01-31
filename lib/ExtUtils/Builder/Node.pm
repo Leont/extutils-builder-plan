@@ -9,7 +9,7 @@ use Carp 'croak';
 
 sub new {
 	my ($class, %args) = @_;
-	croak("Attribute actions is not defined") if not $args{actions};
+	croak('Attribute actions is not defined') if not $args{actions};
 	$args{actions} = [ map { $_->flatten } @{ $args{actions} } ];
 	return $class->SUPER::new(%args);
 }
