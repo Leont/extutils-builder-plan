@@ -1,10 +1,11 @@
 #PODNAME: ExtUtils::Builder::Plan::Overview
+#ABSTRACT: An overview of the foundations of the ExtUtils::Builder Plan framework
 
 =pod
 
 =head1 DESCRIPTION
 
-This document describes the foundations of the ExtUtils::Builder
+This document describes the foundations of the ExtUtils::Builder Plan framework, including Actions, Nodes and Plans.
 
 =head1 RATIONALE
 
