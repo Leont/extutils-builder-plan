@@ -69,7 +69,7 @@ This executes the command immediately.
 
 =method to_command()
 
-This returns C<command>.
+This returns the C<command> attribute.
 
 =method to_code
 

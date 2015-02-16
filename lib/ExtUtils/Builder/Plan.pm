@@ -62,7 +62,18 @@ sub flatten {
 
 =head1 SYNOPSIS
 
- my $plan = Frobnicate->new->plan;
+ package Frobnicate;
+ sub plan {
+     my @nodes = ...;
+     return ExtUtils::Builder::Plan->new(
+         roots => [ 'foo' ],
+         nodes => \@nodes,
+     );
+ }
+
+ my $plan = Frobnicate->plan(@args);
+ 
+ # various consumption methods
  $plan->execute;
  say $_->target for $plan->nodes;
  $backend->consume($plan);
