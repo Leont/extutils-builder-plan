@@ -47,9 +47,15 @@ sub modules {
 sub _get_perl {
 	my %opts = @_;
 	return $opts{perl} if $opts{perl};
-	return eval { require Devel::FindPerl } ? Devel::FindPerl::find_perl_interpreter($opts{config}) : do {
-		File::Spec->is_absolute($^X) ? $^X : defined $opts{config} ? $opts{config}->get('perlpath') : $Config{perlpath};
-	};
+	if ($Config{userelocatableinc}) {
+		require Devel::FindPerl;
+		return Devel::FindPerl::find_perl_interpreter($opts{config});
+	}
+	else {
+		require File::Spec;
+		return $^X if File::Spec->file_name_is_absolute($^X);
+		return defined $opts{config} ? $opts{config}->get('perlpath') : $Config{perlpath};
+	}
 }
 
 sub to_command {
