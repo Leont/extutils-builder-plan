@@ -25,7 +25,8 @@ sub to_code {
 	my $self = shift;
 	require Data::Dumper;
 	my $serialized = Data::Dumper->new([ $self->to_command ])->Terse(1)->Indent(0)->Dump;
-	return "sub { require IPC::System::Simple; IPC::System::Simple::systemx($serialized);";
+	$serialized =~ s/ \A \[ (.*?) \] \z /$1/xms;
+	return "sub { require IPC::System::Simple; IPC::System::Simple::systemx($serialized); }";
 }
 
 sub to_command {
