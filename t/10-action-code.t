@@ -7,7 +7,7 @@ use Config;
 use Test::More 0.89;
 
 use ExtUtils::Builder::Action::Code;
-use Test::Fatal;
+use Test::Fatal 'lives_ok';
 
 {
 	my $action;
@@ -17,20 +17,20 @@ use Test::Fatal;
 		serialized => '$callback->(@_)',
 		message => 'callback',
 	);
-	is(exception { $action = ExtUtils::Builder::Action::Code->new(%args) }, undef, 'Can create new object');
+	lives_ok { $action = ExtUtils::Builder::Action::Code->new(%args) } 'Can create new object';
 
 	{
 		my @actions;
 		local $callback = sub { push @actions, @_ };
 
-		is(exception { $action->execute(quiet => 1) }, undef, 'Can execute command');
+		lives_ok { $action->execute(quiet => 1) } 'Can execute command';
 	}
 
 	{
 		my (@actions, @messages);
 		local $callback = sub { push @actions, @_ };
 
-		is(exception { $action->execute(logger => sub { push @messages, @_ }) }, undef, 'Can execute command');
+		lives_ok { $action->execute(logger => sub { push @messages, @_ }) } 'Can execute command';
 
 		is_deeply(\@messages, [ 'callback' ], 'Got the message');
 	}
