@@ -7,7 +7,8 @@ use Config;
 use Test::More 0.89;
 
 use ExtUtils::Builder::Action::Code;
-use Test::Fatal 'lives_ok';
+use lib 't/lib';
+use Test::LivesOK 'lives_ok';
 
 {
 	my $action;

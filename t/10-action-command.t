@@ -6,7 +6,8 @@ use warnings;
 use Test::More 0.89;
 
 use ExtUtils::Builder::Action::Command;
-use Test::Fatal 'lives_ok';
+use lib 't/lib';
+use Test::LivesOK 'lives_ok';
 
 my $action;
 lives_ok { $action = ExtUtils::Builder::Action::Command->new(command => [ $^X, '-e0' ]) } 'Can create new object';

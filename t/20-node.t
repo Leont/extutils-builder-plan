@@ -4,7 +4,8 @@ use strict;
 use warnings;
 
 use Test::More 0.89;
-use Test::Fatal 'lives_ok';
+use lib 't/lib';
+use Test::LivesOK 'lives_ok';
 
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Action::Code;
