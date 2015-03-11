@@ -1,7 +1,7 @@
 package ExtUtils::Builder::Node;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use parent qw/ExtUtils::Builder::Role::Action::Composite ExtUtils::Builder::Role::Dependency/;
 

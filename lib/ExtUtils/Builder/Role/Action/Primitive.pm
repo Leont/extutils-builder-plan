@@ -1,7 +1,7 @@
 package ExtUtils::Builder::Role::Action::Primitive;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use parent 'ExtUtils::Builder::Role::Action';
 

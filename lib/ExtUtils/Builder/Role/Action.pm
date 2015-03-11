@@ -1,7 +1,7 @@
 package ExtUtils::Builder::Role::Action;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 sub new {
 	my ($class, %args) = @_;

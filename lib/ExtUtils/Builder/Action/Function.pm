@@ -1,7 +1,7 @@
 package ExtUtils::Builder::Action::Function;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Carp 'croak';
 
 use parent 'ExtUtils::Builder::Role::Action::Code';

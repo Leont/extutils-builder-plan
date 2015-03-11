@@ -1,7 +1,7 @@
 package ExtUtils::Builder::Plan;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use Carp ();
 

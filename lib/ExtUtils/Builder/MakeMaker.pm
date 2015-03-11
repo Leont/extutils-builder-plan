@@ -1,7 +1,7 @@
 package ExtUtils::Builder::MakeMaker;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use Exporter;
 our @EXPORT_OK = qw/postamble make_entry escape_command/;

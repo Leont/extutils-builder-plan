@@ -1,7 +1,7 @@
 package ExtUtils::Builder::Role::Dependency;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 sub new {
 	my ($class, %args) = @_;
