@@ -37,17 +37,18 @@ sub make_entry {
 }
 
 sub postamble {
-	my ($self, %args) = @_;
-	my @ret;
+	my ($maker, %args) = @_;
+	my (@ret, @all_deps);
 	if ($args{plans}) {
 		my @plans = ref $args{plans} eq 'ARRAY' ? @{ $args{plans} } : $args{plans};
-		push @ret, 'pure_all :: ' . join ' ', map { $_->roots } @plans;
+		push @all_deps, map { $_->roots } @plans;
 		push @ret, map { make_entry($self, $_->target, [ $_->dependencies ], [ $_ ]) } map { $_->nodes } @plans;
 	}
 	if($args{actions}) {
-		push @ret, 'pure_all :: extra_actions';
-		push @ret, make_entry($self, 'extra_actions', [], [ @{ $args{actions} } ]);
+		push @all_deps, 'extra_actions';
+		push @ret, make_entry($maker, 'extra_actions', [], [ @{ $args{actions} } ]);
 	}
+	unshift @all_deps, 'pure_all :: ' . join ' ', map { quote_dep($maker, $_) } @all_deps if @all_deps;
 	return join "\n\n", @ret;
 }
 
