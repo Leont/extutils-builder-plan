@@ -23,10 +23,17 @@ sub escape_command {
 	return join ' ', map { (my $temp = m{[^\w/\$().-]} ? $maker->quote_literal($_) : $_) =~ s/\n/\\\n\t/g; $temp } @{$elements};
 }
 
+sub quote_dep {
+	my ($maker, $dep) = @_;
+	my $quote_dep = $maker->can('quote_dep') || sub { return $_[1] };
+	return $maker->$quote_dep($dep);
+}
+
 sub make_entry {
 	my ($maker, $target, $dependencies, $actions) = @_;
 	my @commands = map { escape_command($maker, $_) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
-	return join "\n\t", $target . ' : ' . join(' ', @{$dependencies}), @commands;
+	my @dependencies = map { quote_dep($maker, $_) } @{$dependencies};
+	return join "\n\t", $target . ' : ' . join(' ', @dependencies), @commands;
 }
 
 sub postamble {
