@@ -41,8 +41,11 @@ sub postamble {
 	my (@ret, @all_deps);
 	if ($args{plans}) {
 		my @plans = ref $args{plans} eq 'ARRAY' ? @{ $args{plans} } : $args{plans};
-		push @all_deps, map { $_->roots } @plans;
-		push @ret, map { make_entry($self, $_->target, [ $_->dependencies ], [ $_ ]) } map { $_->nodes } @plans;
+		for my $plan (@plans) {
+			push @all_deps, $plan->roots;
+			my @entries = sort { $a->target cmp $b->target } $plan->nodes;
+			push @ret, map { make_entry($maker, $_->target, [ $_->dependencies ], [ $_ ]) } @entries;
+		}
 	}
 	if($args{actions}) {
 		push @all_deps, 'extra_actions';
