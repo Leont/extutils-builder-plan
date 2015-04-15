@@ -56,10 +56,20 @@ sub flatten {
 	return @ret;
 }
 
+sub merge {
+	my ($self, $other) = @_;
+	Carp::croak('Right side of merge is not a Plan') if not $other->isa(__PACKAGE__);
+	my $double = join ', ', grep { $other->{nodes}{$_} } keys %{ $self->{nodes} };
+	Carp::croak("Found key(s) $double on both sides of merge") if $double;
+	my %nodes = (%{ $self->{nodes} }, %{ $other->{nodes} });
+	my %seen;
+	my @roots = grep { !$seen{$_}++ } (@{ $self->{roots} }, @{ $other->{roots} });
+	return __PACKAGE__->SUPER::new(nodes => \%nodes, roots => \@roots);
+}
+
 1;
 
 # ABSTRACT: An ExtUtils::Builder Plan
-
 =head1 SYNOPSIS
 
  package Frobnicate;
@@ -105,3 +115,7 @@ Returns all commands in all actions in the nodes of the plan in a correct order.
 =method to_code
 
 Returns all code-strings in all actions in the nodes of the plan in a correct order.
+
+=method merge($other)
+
+This merges this plan with another, and returns the new plan. Each entry may only exist on one side of the merge.
