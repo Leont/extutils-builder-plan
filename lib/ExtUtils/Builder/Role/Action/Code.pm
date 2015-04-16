@@ -6,7 +6,6 @@ use warnings;
 use parent 'ExtUtils::Builder::Role::Action::Primitive';
 
 use Config;
-use Module::Load ();
 
 sub new { 
 	my ($class, %args) = @_;
@@ -26,7 +25,10 @@ sub _preference_map {
 
 sub execute {
 	my ($self, %opts) = @_;
-	Module::Load::load($_) for $self->modules;
+	for my $module ($self->modules) {
+		(my $filename = "$module.pm") =~ s{::}{/}g;
+		require $filename;
+	}
 	$opts{logger}->($self->message) if $opts{logger} && !$opts{quiet} && exists $self->{message};
 	$self->code->(%{ $self->{arguments} }, %opts);
 	return;
