@@ -25,8 +25,8 @@ sub escape_command {
 
 sub quote_dep {
 	my ($maker, $dep) = @_;
-	my $quote_dep = $maker->can('quote_dep') || sub { return $_[1] };
-	return $maker->$quote_dep($dep);
+	my $quote_dep = $maker->can('quote_dep');
+	return $quote_dep ? $maker->$quote_dep($dep) : $dep;
 }
 
 sub make_entry {
