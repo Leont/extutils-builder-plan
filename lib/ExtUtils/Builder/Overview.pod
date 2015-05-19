@@ -23,7 +23,7 @@ An action can be consumed in many ways.
 
 =item * execute(%args)
 
-This is often the simplest way of dealing with an action. It simple performs the action immediately, and will throw an exception on failure. The commands may take arbitrary named arguments.
+This is often the simplest way of dealing with an action. It simple performs the action immediately, and will throw an exception on failure.
 
 =item * to_command(%opts)
 
@@ -33,13 +33,11 @@ This converts the action into a list of commands to be executed. The elements of
    system(@$command);
  }
 
-It can take two optional named arguments: C<perl> for the path to perl, and C<config> for an L<ExtUtils::Config> object used the find the current perl. The command may take additional named arguments as pairs on the command line.
+It can take two optional named arguments: C<perl> for the path to perl, and C<config> for an L<ExtUtils::Config> object used the find the current perl.
 
 =item * to_code()
 
-This converts the action into a list of strings to be C<eval>ed. The evaled values are coderefs that take arguments the same way C<execute> does.
-
-This can be useful when you want to serialize the work that is to be done but don't want to force it to shell out.
+This converts the action into a list of strings to be C<eval>ed in order to execute them. This can be useful when you want to serialize the work that is to be done but don't want to force it to shell out.
 
 =item * flatten()
 
@@ -51,7 +49,7 @@ On L<composite|ExtUtils::Builder::Role::Action::Composite> actions, C<flatten> c
 If a consumer can consume actions in more than one way, the C<preference> method can be used to choose between options. This function expects a list of options out of C<code>, C<command>, C<execute> and C<flatten>. You probably want to flatten your action first, as different constituents may have different preferences.
 
  for my $action ($work->flatten) {
-   my $preference = $self->preference(qw/code command/);
+   my $preference = $self->preference('code', 'command');
    push @serialized, ($preference eq 'code')
      ? [ eval => $action->to_code ] 
      : [ exec => $action->to_command ];

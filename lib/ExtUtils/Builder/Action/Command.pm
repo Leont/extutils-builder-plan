@@ -16,17 +16,14 @@ sub _preference_map {
 	};
 }
 
-sub new {
-	my ($class, %args) = @_;
-	return $class->SUPER::new(%args);
-}
-
 sub to_code {
-	my $self = shift;
+	my ($self, %args) = @_;
 	require Data::Dumper;
-	my $serialized = Data::Dumper->new([ $self->to_command ])->Terse(1)->Indent(0)->Dump;
-	$serialized =~ s/ \A \[ (.*?) \] \z /$1/xms;
-	return "sub { require IPC::System::Simple; IPC::System::Simple::systemx($serialized); }";
+	my $serialized = Data::Dumper->new($self->{command})->Terse(1)->Indent(0)->Dump;
+	my $skip_loading = $args{skip_loading} || '';
+	my $loading = $skip_loading ? '' : 'require IPC::System::Simple; ';
+	my $module = $skip_loading eq 'main' ? '' : 'IPC::System::Simple::';
+	return join '', $loading, $module, 'systemx(', $serialized, ')';
 }
 
 sub to_command {

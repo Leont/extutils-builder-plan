@@ -10,8 +10,9 @@ use Test::LivesOK 'lives_ok';
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Action::Code;
 
-my ($node, @triggered);
-my @actions = map { my $num = $_; ExtUtils::Builder::Action::Code->new(code => sub { push @triggered, $num }) } 1, 2;
+our @triggered;
+my @actions = map { ExtUtils::Builder::Action::Code->new(code => "push \@::triggered, $_") } 1, 2;
+my $node;
 lives_ok { $node = ExtUtils::Builder::Node->new(target => 'foo', dependencies => [ qw/bar baz/ ], actions => \@actions) } 'Can create new object';
 
 lives_ok { $node->execute } 'Can execute quiet command';

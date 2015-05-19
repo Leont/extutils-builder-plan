@@ -7,13 +7,6 @@ use parent 'ExtUtils::Builder::Role::Action::Primitive';
 
 use Config;
 
-sub new { 
-	my ($class, %args) = @_;
-	$args{modules} ||= [];
-	$args{arguments} ||= {};
-	return $class->SUPER::new(%args);
-}
-
 sub _preference_map {
 	return {
 		execute => 3,
@@ -23,27 +16,16 @@ sub _preference_map {
 	};
 }
 
-sub execute {
-	my ($self, %opts) = @_;
-	for my $module ($self->modules) {
-		(my $filename = "$module.pm") =~ s{::}{/}g;
-		require $filename;
-	}
-	$opts{logger}->($self->message) if $opts{logger} && !$opts{quiet} && exists $self->{message};
-	$self->code->(%{ $self->{arguments} }, %opts);
-	return;
-}
-
-sub _get_arguments {
-	my ($self, $format, $default) = @_;
-	return $default || '' if !%{ $self->{arguments} };
-	require Data::Dumper;
-	return sprintf $format, (Data::Dumper->new([ $self->{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \{ (.*) \} $/x)[0];
-}
-
 sub modules {
 	my $self = shift;
 	return @{ $self->{modules} };
+}
+
+sub execute {
+	my ($self, %opts) = @_;
+	$opts{logger}->($self->{message}) if $opts{logger} && !$opts{quiet} && exists $self->{message};
+	eval $self->to_code() . '; 1' or die $@;
+	return;
 }
 
 sub _get_perl {
@@ -60,11 +42,16 @@ sub _get_perl {
 	}
 }
 
+sub to_code {
+	my ($self, %opts) = @_;
+	my @modules = $opts{skip_loading} ? () : map { "require $_; " } $self->modules;
+	return join '', @modules, $self->code(%opts);
+}
+
 sub to_command {
 	my ($self, %opts) = @_;
 	my @modules = map { "-M$_" } $self->modules;
-	my $args = $self->_get_arguments('%s, @ARGV', '@ARGV');
-	return [ _get_perl(%opts), @modules, '-e', $self->_to_call() . "($args)" ];
+	return [ _get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;
@@ -74,14 +61,6 @@ sub to_command {
 =head1 DESCRIPTION
 
 This role provides most functionality of Code Actions.
-
-=attr arguments
-
-These are additional arguments to the action, that are passed on regardless of how the action is run. This attribute is optional.
-
-=attr modules
-
-This is an optional list of modules that will be dynamically loaded before the action is run in any way. This attribute is optional.
 
 =attr message
 
@@ -98,7 +77,5 @@ This returns an arrayref containing a command for this action.
 =method preference
 
 This will prefer handling methods in the following order: execute, code, command, flatten
-
-=method code
 
 …

@@ -5,54 +5,20 @@ use warnings;
 
 use parent 'ExtUtils::Builder::Role::Action::Code';
 
-use Carp            ();
+use Carp ();
 
 sub new {
 	my ($class, %args) = @_;
-	Carp::croak('Need to define at least one of code or serialized') if !$args{code} && !$args{serialized};
+	Carp::croak('Need to define code') if !$args{code};
+	$args{modules} ||= [];
 	my $self = $class->SUPER::new(%args);
-	$self->{code} = $args{code} if $args{code};
-	$self->{serialized} = $args{serialized} if $args{serialized};
 	return $self;
-}
-
-my %code_cache;
-sub code {
-	my $self = shift;
-	return $self->{code} ||= do {
-		my $self = shift;
-		my $code = $self->to_code(skip_loading => 1);
-		$code_cache{$code} ||= eval($code) || Carp::croak("Couldn't evaluate serialized: $@");
-	};
-}
-
-sub serialized {
-	my $self = shift;
-	return $self->{serialized} ||= do {
-		require B::Deparse;
-		my $core = B::Deparse->new('-sCi0')->coderef2text($self->{code});
-		$core =~ s/ \A { ( .* ) } \z /$1/msx;
-		$core =~ s/ \A \n? (.*?) ;? \n? \z /$1/mx;
-		$core;
-	};
 }
 
 sub to_code {
 	my ($self, %opts) = @_;
-	my @modules = $opts{skip_loading} ? () : map { "require $_; " } $self->modules;
-	my $args = $self->_get_arguments('unshift @_, %s; ');
-	return join '', 'sub { ', @modules, $args, $self->serialized, ' }';
-}
-
-sub _to_call {
-	my $self = shift;
-	my $serialized = $self->to_code(skip_loading => 1);
-	return $serialized =~ /\A sub\ \{ [ ] ([\w:]+) \( \@_ \) [ ] \} \z /x ? $1 : "$serialized->"
-}
-
-sub message {
-	my $self = shift;
-	return $self->{message};
+	my @modules = $opts{skip_loading} ? () : map { "require $_" } $self->modules;
+	return join '; ', @modules, $self->{code};
 }
 
 1;
@@ -62,11 +28,9 @@ sub message {
 =head1 SYNOPSIS
 
  my $action = ExtUtils::Builder::Action::Code->new(
-     code       => \&Frob::nicate,
-     serialized => 'Frob::nicate(@_)',
-     message    => 'frobnicateing foo',
-     arguments  => [ source => 'foo'],
+     code      => 'Frob::nicate(@_)',
      modules    => ['Frob'],
+     message   => 'frobnicateing foo',
  );
  $action->execute(target => 'bar');
  say "Executed: ", join ' ', @$_, target => 'bar' for $action->to_command;
@@ -79,9 +43,9 @@ This is a primitive action object wrapping a piece of perl code. The easiest way
 
 This is a code-ref containing the action. On execution, it is passed the arguments of the execute method; when run as command it is passed @ARGV. In either case, C<arguments> is also passed. Of not given, it is C<eval>ed from C<serialized>.
 
-=attr serialized
+=attr modules
 
-This is the stringified form of the code of the action. For execution, it's put in a sub with the action's arguments as the subs arguments. If not given, it's decompiled from C<code>.
+This is an optional list of modules that will be dynamically loaded before the action is run in any way. This attribute is optional.
 
 =method to_code
 
