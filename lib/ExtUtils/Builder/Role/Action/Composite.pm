@@ -3,7 +3,7 @@ package ExtUtils::Builder::Role::Action::Composite;
 use strict;
 use warnings;
 
-use parent 'ExtUtils::Builder::Role::Action';
+use base 'ExtUtils::Builder::Role::Action';
 
 sub _preference_map {
 	return {

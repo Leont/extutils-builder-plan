@@ -3,7 +3,7 @@ package ExtUtils::Builder::Action::Command;
 use strict;
 use warnings;
 
-use parent 'ExtUtils::Builder::Role::Action::Primitive';
+use base 'ExtUtils::Builder::Role::Action::Primitive';
 
 use IPC::System::Simple qw/systemx/;
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-use parent 'ExtUtils::Builder::Role::Action::Composite';
+use base 'ExtUtils::Builder::Role::Action::Composite';
 
 sub new {
 	my ($class, %args) = @_;
