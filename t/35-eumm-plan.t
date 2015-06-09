@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More 0.89;
 
+use Config;
 use File::Temp qw/tempdir/;
 use Devel::FindPerl 'find_perl_interpreter';
 
@@ -49,9 +50,8 @@ my $content = do { local $/; <$mf> };
 
 like($content, qr/^\t touch .* very_unlikely_name/xm, 'Makefile contains very_unlikely_name');
 
-if ($ENV{AUTHOR_TESTING}) {
-	system 'make';
-	ok(-e 'very_unlikely_name', "Unlikely file has been touched");
-}
+my $make = $ENV{MAKE} || $Config{make};
+system $make;
+ok(-e 'very_unlikely_name', "Unlikely file has been touched");
 
 done_testing;
