@@ -51,7 +51,7 @@ sub postamble {
 		push @all_deps, 'extra_actions';
 		push @ret, make_entry($maker, 'extra_actions', [], [ @{ $args{actions} } ]);
 	}
-	unshift @all_deps, 'pure_all :: ' . join ' ', map { quote_dep($maker, $_) } @all_deps if @all_deps;
+	unshift @ret, 'pure_all :: ' . join ' ', map { quote_dep($maker, $_) } @all_deps if @all_deps;
 	return join "\n\n", @ret;
 }
 
