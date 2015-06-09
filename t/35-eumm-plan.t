@@ -36,6 +36,8 @@ WriteMakefile(
 	postamble => {
 		plans => [ $plan ],
 	},
+	NO_MYMETA => 1,
+	NO_META => 1,
 );
 
 END
