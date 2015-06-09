@@ -16,14 +16,17 @@ chdir $tempdir;
 
 open my $mfpl, '>', 'Makefile.PL';
 
-print $mfpl <<'END';
+my @touch_prefix = $^O eq 'MSWin32' || $^O eq 'VMS' ? ($^X, '-MExtUtils::Command', '-e') : ();
+my $touch = join ', ', map { qq{'$_'} } @touch_prefix, 'touch';
+
+printf $mfpl <<'END', $touch;
 use ExtUtils::MakeMaker;
 use ExtUtils::Builder::MakeMaker -global;
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Action::Command;
 
-my $action = ExtUtils::Builder::Action::Command->new(command => ['touch', 'very_unlikely_name']);
+my $action = ExtUtils::Builder::Action::Command->new(command => [%s, 'very_unlikely_name']);
 my $node = ExtUtils::Builder::Node->new(actions => [ $action ], dependencies => [], target => 'foo');
 my $plan = ExtUtils::Builder::Plan->new(nodes => [ $node ], roots => 'foo');
 
@@ -46,7 +49,7 @@ ok(-e 'Makefile', 'Makefile exists');
 open my $mf, '<', 'Makefile' or die "Couldn't open Makefile: $!";
 my $content = do { local $/; <$mf> };
 
-like($content, qr/^\t touch .* very_unlikely_name/xm, 'Makefile contains very_unlikely_name');
+like($content, qr/^\t .* touch .* very_unlikely_name/xm, 'Makefile contains very_unlikely_name');
 
 my $make = $ENV{MAKE} || $Config{make};
 system $make;
