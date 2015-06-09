@@ -19,7 +19,8 @@ sub _preference_map {
 sub to_code {
 	my ($self, %args) = @_;
 	require Data::Dumper;
-	my $serialized = Data::Dumper->new($self->{command})->Terse(1)->Indent(0)->Dump;
+	my $serialized = Data::Dumper->new([$self->{command}])->Terse(1)->Indent(0)->Dump;
+	$serialized =~ s/ \A \[ (.*?) \] \z /$1/xms;
 	my $skip_loading = $args{skip_loading} || '';
 	my $loading = $skip_loading ? '' : 'require IPC::System::Simple; ';
 	my $module = $skip_loading eq 'main' ? '' : 'IPC::System::Simple::';
