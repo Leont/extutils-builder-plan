@@ -7,10 +7,8 @@ use Test::More 0.89;
 
 use Config;
 use File::Temp qw/tempdir/;
-use Devel::FindPerl 'find_perl_interpreter';
 
-my @perl = find_perl_interpreter();
-system @perl, '-e0' and plan(skip_all => 'Can\'t find perl');
+system $^X, '-e0' and plan(skip_all => 'Can\'t find perl');
 
 my $tempdir = tempdir();
 
@@ -41,7 +39,7 @@ END
 
 close $mfpl;
 
-system @perl, 'Makefile.PL';
+system $^X, 'Makefile.PL';
 
 ok(-e 'Makefile', 'Makefile exists');
 
