@@ -5,8 +5,6 @@ use warnings;
 
 use base 'ExtUtils::Builder::Role::Action::Primitive';
 
-use IPC::System::Simple qw/systemx/;
-
 sub _preference_map {
 	return {
 		command => 3,
@@ -22,9 +20,8 @@ sub to_code {
 	my $serialized = Data::Dumper->new([$self->{command}])->Terse(1)->Indent(0)->Dump;
 	$serialized =~ s/ \A \[ (.*?) \] \z /$1/xms;
 	my $skip_loading = $args{skip_loading} || '';
-	my $loading = $skip_loading ? '' : 'require IPC::System::Simple; ';
-	my $module = $skip_loading eq 'main' ? '' : 'IPC::System::Simple::';
-	return join '', $loading, $module, 'systemx(', $serialized, ')';
+	my $loading = $skip_loading ? '' : '';
+	return qq{system($serialized) and die "Could not run command " . join ' ', $serialized};
 }
 
 sub to_command {
@@ -35,10 +32,10 @@ sub to_command {
 my $quote = $^O eq 'MSWin32' ? do { require Win32::ShellQuote; \&Win32::ShellQuote::quote_system_list } : sub { @_ };
 sub execute {
 	my ($self, %opts) = @_;
-	my @command = @{ $self->to_command };
+	my @command = @{ $self->{command} };
 	my $message = join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @command;
 	$opts{logger}->($message) if $opts{logger} and not $opts{quiet};
-	systemx($quote->(@command)) if not $opts{dry_run};
+	system($quote->(@command)) and die "Could not run command @command" if not $opts{dry_run};
 	return;
 }
 
