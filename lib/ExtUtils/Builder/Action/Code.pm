@@ -3,7 +3,7 @@ package ExtUtils::Builder::Action::Code;
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Role::Action::Code';
+use base 'ExtUtils::Builder::Role::Action::Perl';
 
 use Carp ();
 

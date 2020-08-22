@@ -1,4 +1,4 @@
-package ExtUtils::Builder::Role::Action::Code;
+package ExtUtils::Builder::Role::Action::Perl;
 
 use strict;
 use warnings;

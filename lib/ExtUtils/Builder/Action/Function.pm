@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-use base 'ExtUtils::Builder::Role::Action::Code';
+use base 'ExtUtils::Builder::Role::Action::Perl';
 
 sub new {
 	my ($class, %args) = @_;
