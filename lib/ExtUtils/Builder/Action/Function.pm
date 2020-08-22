@@ -34,7 +34,7 @@ sub to_code {
 	my $shortcut = $args{skip_loading} && $args{skip_loading} eq 'main' && $self->{exports};
 	my $name = $shortcut ? $self->{function} : $self->{fullname};
 	my @modules = $opts{skip_loading} ? () : map { "require $_" } $self->modules;
-	my $arguments = %{ $self->{arguments} } ? do {
+	my $arguments = @{ $self->{arguments} } ? do {
 		require Data::Dumper; (Data::Dumper->new([ $args{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \[ (.*) \] $/x)[0]
 	} : '';
 	return join '; ', @modules, sprintf '%s(%s)', $name, $arguments;
@@ -49,7 +49,7 @@ sub to_code {
  my $action = ExtUtils::Builder::Action::Function->new(
      module    => 'Frob',
      function  => 'nicate',
-     arguments => { target => 'bar' },
+     arguments => [ target => 'bar' ],
  );
  $action->execute();
  say "Executed: ", join ' ', @$_, target => 'bar' for $action->to_command;
