@@ -1,4 +1,4 @@
-package ExtUtils::Builder::Role::Dependency;
+package ExtUtils::Builder::Dependency;
 
 use strict;
 use warnings;

@@ -3,7 +3,7 @@ package ExtUtils::Builder::Action::Code;
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Role::Action::Perl';
+use base 'ExtUtils::Builder::Action::Perl';
 
 use Carp ();
 
@@ -37,7 +37,7 @@ sub to_code {
 
 =head1 DESCRIPTION
 
-This is a primitive action object wrapping a piece of perl code. The easiest way to use it is to execute it immediately. For more information on using actions, see L<ExtUtils::Builder::Role::Action|ExtUtils::Builder::Role::Action>. The core attributes are code and serialized, though only one of them must be given, both is strongly recommended.
+This is a primitive action object wrapping a piece of perl code. The easiest way to use it is to execute it immediately. For more information on using actions, see L<ExtUtils::Builder::Action|ExtUtils::Builder::Action>. The core attributes are code and serialized, though only one of them must be given, both is strongly recommended.
 
 =attr code
 

@@ -1,9 +1,9 @@
-package ExtUtils::Builder::Role::Action::Primitive;
+package ExtUtils::Builder::Action::Primitive;
 
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Role::Action';
+use base 'ExtUtils::Builder::Action';
 
 sub flatten {
 	my $self = shift;

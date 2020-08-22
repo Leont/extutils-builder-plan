@@ -1,9 +1,9 @@
-package ExtUtils::Builder::Role::Action::Perl;
+package ExtUtils::Builder::Action::Perl;
 
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Role::Action::Primitive';
+use base 'ExtUtils::Builder::Action::Primitive';
 
 use Config;
 

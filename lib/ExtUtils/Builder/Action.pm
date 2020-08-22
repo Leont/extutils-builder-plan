@@ -1,4 +1,4 @@
-package ExtUtils::Builder::Role::Action;
+package ExtUtils::Builder::Action;
 
 use strict;
 use warnings;
@@ -33,7 +33,7 @@ Actions are the cornerstone of the ExtUtils::Builder framework. They provide an 
 
 =head1 OVERVIEW
 
-An action can be consumed in many ways. It can be C<execute>d, which is often the simplest way to deal with them. It can be serialized to commands that can be passed on to system or strings that can be C<eval>led. If a consumer can deal with multiple of these, the C<preference> method can be used to choose between options. On L<composite|ExtUtils::Builder::Role::Action::Composite> actions, C<flatten> can be called to retrieve the constituent actions, on L<primitive|ExtUtils::Builder::Role::Action::Primitive> actions it's just an identity operator. This is particularly useful before calling preference, because different sub-actions are likely to have different preferences.
+An action can be consumed in many ways. It can be C<execute>d, which is often the simplest way to deal with them. It can be serialized to commands that can be passed on to system or strings that can be C<eval>led. If a consumer can deal with multiple of these, the C<preference> method can be used to choose between options. On L<composite|ExtUtils::Builder::Action::Composite> actions, C<flatten> can be called to retrieve the constituent actions, on L<primitive|ExtUtils::Builder::Action::Primitive> actions it's just an identity operator. This is particularly useful before calling preference, because different sub-actions are likely to have different preferences.
 
 =method execute(%arguments)
 

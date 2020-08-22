@@ -42,7 +42,7 @@ This converts the action into a list of strings to be C<eval>ed in order to exec
 =item * flatten()
 
 This will return all primitive actions involved in this action. It may return C<$self>, it may return an empty list.
-On L<composite|ExtUtils::Builder::Role::Action::Composite> actions, C<flatten> can be called to retrieve the constituent actions, C<flatten> is guaranteed to only return primitive actions.
+On L<composite|ExtUtils::Builder::Action::Composite> actions, C<flatten> can be called to retrieve the constituent actions, C<flatten> is guaranteed to only return primitive actions.
 
 =item * preference(@options)
 
@@ -59,7 +59,7 @@ If a consumer can consume actions in more than one way, the C<preference> method
 
 =head2 Primitives
 
-On primitive actions, all serialization methods will return a single item list. There are two types of of primitive actions shipped with this dist: L<Command|ExtUtils::Builder::Command> and L<Code|ExtUtils::Builder::Role::Code>. Commands are essentially an abstraction around a call to an external command, Codes are an abstraction around a piece of Perl code. While these are all implementing the same interfaces, they have their own (hopefully obvious) preferences on how to be treated. C<flatten> is just an identity operator for primitive actions.
+On primitive actions, all serialization methods will return a single item list. There are two types of of primitive actions shipped with this dist: L<Command|ExtUtils::Builder::Command> and L<Code|ExtUtils::Builder::Code>. Commands are essentially an abstraction around a call to an external command, Codes are an abstraction around a piece of Perl code. While these are all implementing the same interfaces, they have their own (hopefully obvious) preferences on how to be treated. C<flatten> is just an identity operator for primitive actions.
 
 =head2 Composites
 

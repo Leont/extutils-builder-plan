@@ -3,7 +3,7 @@ package ExtUtils::Builder::Action::Command;
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Role::Action::Primitive';
+use base 'ExtUtils::Builder::Action::Primitive';
 
 sub _preference_map {
 	return {
@@ -52,7 +52,7 @@ sub execute {
 
 =head1 DESCRIPTION
 
-This is a primitive action object wrapping an external command. The easiest way to use it is to serialize it to command, though it doesn't mind being executed right away. For more information on actions, see L<ExtUtils::Builder::Role::Action|ExtUtils::Builder::Role::Action>.
+This is a primitive action object wrapping an external command. The easiest way to use it is to serialize it to command, though it doesn't mind being executed right away. For more information on actions, see L<ExtUtils::Builder::Action|ExtUtils::Builder::Action>.
 
 =attr command
 

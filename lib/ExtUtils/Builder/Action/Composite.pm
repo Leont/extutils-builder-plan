@@ -1,9 +1,9 @@
-package ExtUtils::Builder::Role::Action::Composite;
+package ExtUtils::Builder::Action::Composite;
 
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Role::Action';
+use base 'ExtUtils::Builder::Action';
 
 sub _preference_map {
 	return {

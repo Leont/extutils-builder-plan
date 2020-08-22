@@ -102,7 +102,7 @@ This generates a postamble for C<$makemaker> into a postamble section in the mak
 
 =func make_entry($makemaker, $target, $dependencies, $actions)
 
-This takes a build-triplet (C<$target, $dependencies, $actions>) and formats it into a makefile entry. C<$target> is supposed to be a simple string containing the name of the target. C<$dependencies> is an array-ref of strings containing the list of dependencies. C<$actions> is supposed to be an array-ref of L<Action|ExtUtils::Builder::Role::Action> objects.
+This takes a build-triplet (C<$target, $dependencies, $actions>) and formats it into a makefile entry. C<$target> is supposed to be a simple string containing the name of the target. C<$dependencies> is an array-ref of strings containing the list of dependencies. C<$actions> is supposed to be an array-ref of L<Action|ExtUtils::Builder::Action> objects.
 
 =func escape_command($makemaker, $elements)
 

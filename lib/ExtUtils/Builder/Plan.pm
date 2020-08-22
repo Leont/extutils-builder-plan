@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-use base 'ExtUtils::Builder::Role::Action::Composite';
+use base 'ExtUtils::Builder::Action::Composite';
 
 sub new {
 	my ($class, %args) = @_;
@@ -90,7 +90,7 @@ sub merge {
 
 =head1 DESCRIPTION
 
-This module a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its <execute> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Role::Action>, but you're unlikely to want to use it like that.
+This module a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its <execute> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Action>, but you're unlikely to want to use it like that.
 
 =attr nodes
 
