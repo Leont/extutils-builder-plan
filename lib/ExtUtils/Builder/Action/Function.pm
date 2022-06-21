@@ -33,7 +33,7 @@ sub to_code {
 	my $skip_loading = $args{skip_loading} || '';
 	my $shortcut = $args{skip_loading} && $args{skip_loading} eq 'main' && $self->{exports};
 	my $name = $shortcut ? $self->{function} : $self->{fullname};
-	my @modules = $opts{skip_loading} ? () : map { "require $_" } $self->modules;
+	my @modules = $args{skip_loading} ? () : map { "require $_" } $self->modules;
 	my $arguments = @{ $self->{arguments} } ? do {
 		require Data::Dumper; (Data::Dumper->new([ $args{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \[ (.*) \] $/x)[0]
 	} : '';
