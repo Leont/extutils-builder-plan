@@ -35,7 +35,7 @@ sub to_code {
 	my $name = $shortcut ? $self->{function} : $self->{fullname};
 	my @modules = $args{skip_loading} ? () : map { "require $_" } $self->modules;
 	my $arguments = @{ $self->{arguments} } ? do {
-		require Data::Dumper; (Data::Dumper->new([ $args{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \[ (.*) \] $/x)[0]
+		require Data::Dumper; (Data::Dumper->new([ $self->{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \[ (.*) \] $/x)[0]
 	} : '';
 	return join '; ', @modules, sprintf '%s(%s)', $name, $arguments;
 }
