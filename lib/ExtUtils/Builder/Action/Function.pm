@@ -21,8 +21,10 @@ sub new {
 
 sub execute {
 	my ($self, %args) = @_;
-	(my $filename = "$self->{module}.pm") =~ s{::}{/}g;
-	require $filename;
+	for my $module (@{ $self->{modules} }) {
+		(my $filename = $module) =~ s{::}{/}g;
+		require $filename;
+	}
 
 	my $code = do { no strict 'refs'; \&{ $self->{fullname} } };
 	$code->(@{ $self->{arguments} });
@@ -30,7 +32,6 @@ sub execute {
 
 sub to_code {
 	my ($self, %args) = @_;
-	my $skip_loading = $args{skip_loading} || '';
 	my $shortcut = $args{skip_loading} && $args{skip_loading} eq 'main' && $self->{exports};
 	my $name = $shortcut ? $self->{function} : $self->{fullname};
 	my @modules = $args{skip_loading} ? () : map { "require $_" } $self->modules;

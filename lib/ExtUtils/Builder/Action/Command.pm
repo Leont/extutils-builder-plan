@@ -19,8 +19,6 @@ sub to_code {
 	require Data::Dumper;
 	my $serialized = Data::Dumper->new([$self->{command}])->Terse(1)->Indent(0)->Dump;
 	$serialized =~ s/ \A \[ (.*?) \] \z /$1/xms;
-	my $skip_loading = $args{skip_loading} || '';
-	my $loading = $skip_loading ? '' : '';
 	return qq{system($serialized) and die "Could not run command " . join ' ', $serialized};
 }
 
