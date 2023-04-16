@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp ();
+use Scalar::Util ();
 
 use base 'ExtUtils::Builder::Action::Composite';
 
@@ -62,9 +63,8 @@ sub merge {
 	my $double = join ', ', grep { $other->{nodes}{$_} } keys %{ $self->{nodes} };
 	Carp::croak("Found key(s) $double on both sides of merge") if $double;
 	my %nodes = (%{ $self->{nodes} }, %{ $other->{nodes} });
-	my %seen;
-	my @roots = grep { !$seen{$_}++ } (@{ $self->{roots} }, @{ $other->{roots} });
-	return __PACKAGE__->SUPER::new(nodes => \%nodes, roots => \@roots);
+	my @roots = Scalar::Util::uniq(@{ $self->{roots} }, @{ $other->{roots} });
+	return ref($self)->new(nodes => [ values %nodes ], roots => \@roots);
 }
 
 1;
