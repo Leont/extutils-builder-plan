@@ -25,9 +25,11 @@ use ExtUtils::Builder::MakeMaker -global;
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Action::Command;
+use ExtUtils::Builder::Action::Code;
 
-my $action = ExtUtils::Builder::Action::Command->new(command => [%s, 'very_unlikely_name']);
-my $node = ExtUtils::Builder::Node->new(actions => [ $action ], dependencies => [], target => 'foo');
+my $action1 = ExtUtils::Builder::Action::Command->new(command => [%s, 'very_unlikely_name']);
+my $action2 = ExtUtils::Builder::Action::Code->new(code => 'open my $fh, ">", "other_unlikely_name"');
+my $node = ExtUtils::Builder::Node->new(actions => [ $action1, $action2 ], dependencies => [], target => 'foo');
 my $plan = ExtUtils::Builder::Plan->new(nodes => [ $node ], roots => 'foo');
 
 WriteMakefile(
@@ -56,5 +58,6 @@ like($content, qr/^\t .* touch .* very_unlikely_name/xm, 'Makefile contains very
 my $make = $ENV{MAKE} || $Config{make};
 system $make;
 ok(-e 'very_unlikely_name', "Unlikely file has been touched");
+ok(-e 'other_unlikely_name', "Unlikely file has been touched");
 
 done_testing;
