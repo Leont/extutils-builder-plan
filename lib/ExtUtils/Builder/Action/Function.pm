@@ -23,7 +23,7 @@ sub execute {
 	my ($self, %args) = @_;
 	for my $module (@{ $self->{modules} }) {
 		(my $filename = $module) =~ s{::}{/}g;
-		require $filename;
+		require "$filename.pm";
 	}
 
 	my $code = do { no strict 'refs'; \&{ $self->{fullname} } };
