@@ -90,7 +90,7 @@ sub merge {
 
 =head1 DESCRIPTION
 
-This module a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its <execute> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Action>, but you're unlikely to want to use it like that.
+An object of this class describes a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its <execute> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Action>, but you're unlikely to want to use it like that.
 
 =attr nodes
 
@@ -119,3 +119,9 @@ Returns all code-strings in all actions in the nodes of the plan in a correct or
 =method merge($other)
 
 This merges this plan with another, and returns the new plan. Each entry may only exist on one side of the merge.
+
+=begin Pod::Coverage
+
+new
+
+=end Pod::Coverage

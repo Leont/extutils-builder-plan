@@ -33,3 +33,9 @@ The name of the target in this relationship.
 =attr dependencies
 
 A list of names of dependencies.
+
+=begin Pod::Coverage
+
+new
+
+=end Pod::Coverage

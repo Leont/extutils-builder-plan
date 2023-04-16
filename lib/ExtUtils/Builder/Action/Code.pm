@@ -29,7 +29,7 @@ sub to_code {
 
  my $action = ExtUtils::Builder::Action::Code->new(
      code      => 'Frob::nicate(@_)',
-     modules    => ['Frob'],
+     modules   => ['Frob'],
      message   => 'frobnicateing foo',
  );
  $action->execute(target => 'bar');
@@ -53,6 +53,6 @@ This returns the code-string for this action.
 
 =begin Pod::Coverage
 
-BUILD
+new
 
 =end Pod::Coverage

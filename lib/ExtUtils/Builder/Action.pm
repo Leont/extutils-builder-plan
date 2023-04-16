@@ -78,3 +78,9 @@ This action returns the favored out of C<@possibilities>. Valid values are C<exe
 =method flatten
 
 This action returns all actions behind this action. It may return itself, it may return a long list of actions, it may even return an empty list.
+
+=begin Pod::Coverage
+
+new
+
+=end Pod::Coverage

@@ -57,11 +57,11 @@ sub to_code {
 
 =head1 DESCRIPTION
 
-This Action class is a specialization of L<Action::Code|ExtUtils::Builder::Action::Code> that makes the common case of calling a simple function easier. The first statement in the synopsis is roughly equivalent to:
+This Action class is a specialization of L<Action::Perl|ExtUtils::Builder::Action::Perl> that makes the common case of calling a simple function easier. The first statement in the synopsis is roughly equivalent to:
 
  my $action = ExtUtils::Builder::Action::Code->new(
      code       => 'Frob::nicate(target => 'bar')',
-     modules    => ['Frob'],
+     module     => ['Frob'],
      message    => 'Calling Frob::nicate',
  );
 
@@ -73,16 +73,16 @@ These are additional arguments to the action, that are passed on regardless of h
 
 =attr module
 
+The module to be loaded.
+
 =attr function
+
+The name of the function to be called.
 
 =attr exports 
 
+If true, the function is assumed to be exported by the module.
+
 =method to_code
 
-=begin Pod::Coverage
-
-BUILDARGS
-code
-fullname
-
-=end Pod::Coverage
+This returns a piece of code that will run the command.

@@ -60,17 +60,17 @@ sub to_command {
 
 =head1 DESCRIPTION
 
-This role provides most functionality of Code Actions.
+This class provides most functionality of Code Actions.
 
 =attr message
 
 This is a message that will be logged during execution. This attribute is optional.
 
-=method execute
+=method execute(%opts)
 
 This executes the command immediately.
 
-=method to_command
+=method to_command(%opts)
 
 This returns an arrayref containing a command for this action.
 
@@ -78,4 +78,6 @@ This returns an arrayref containing a command for this action.
 
 This will prefer handling methods in the following order: execute, code, command, flatten
 
-…
+=method modules
+
+This will return the modules needed for this action.

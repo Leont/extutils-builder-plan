@@ -71,13 +71,17 @@ sub postamble {
 
 =head1 DESCRIPTION
 
-This MakeMaker extension consumes ExtUtils::Builder::Plan objects, converting them into the Makefile. It's used by passing on the plans using the postamble.plans argument of WriteMakefile. It can be loaded in two ways, depending on your need.
+This MakeMaker extension consumes ExtUtils::Builder::Plan objects, converting them into the Makefile. It's used by passing on the plans using the postamble.plans argument of WriteMakefile. It can be loaded in two ways, depending on your needs.
 
 =over 4
 
 =item * Global.
 
-This can be done by giving the use statement a -global argument. This will install ExtUtils::Builder::MakeMaker's as the global postamble. This is the easiest method of using it, but is not compatible with using other postamble extensions to MakeMaker. This is equivalend to:
+This can be done by giving the use statement a C<-global> argument.
+
+ use ExtUtils::Builder::MakeMaker -global;
+
+This will install ExtUtils::Builder::MakeMaker's as the global postamble. This is the easiest method of using it, but is not compatible with using other postamble extensions to MakeMaker. This is equivalend to:
 
  package MY;
  use ExtUtils::Builder::MakeMaker 'postamble';
