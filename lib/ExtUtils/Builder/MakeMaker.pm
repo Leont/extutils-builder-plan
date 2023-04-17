@@ -21,6 +21,11 @@ sub import {
 	return;
 }
 
+sub get_config {
+	my ($maker) = @_;
+	return ExtUtils::Builder::MakeMaker::Config->new($maker);
+}
+
 sub escape_command {
 	my ($maker, $elements) = @_;
 	return join ' ', map { (my $temp = m{[^\w/\$().-]} ? $maker->quote_literal($_) : $_) =~ s/\n/\\\n\t/g; $temp } @{$elements};
@@ -71,7 +76,7 @@ sub postamble {
 
  sub MY::postamble {
    my ($self) = @_;
-   my @plans = Frobnicator->new->plans;
+   my @plans = Frobnicator->new($self->get_config)->plans;
    $self->SUPER::postamble(plans => \@plans);
  }
 
