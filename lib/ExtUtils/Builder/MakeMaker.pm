@@ -5,12 +5,15 @@ use warnings;
 
 use Exporter;
 our @EXPORT_OK = qw/postamble make_entry escape_command/;
+our @ISA;
 
 sub import {
 	my ($class, @args) = @_;
 	if (@args == 1 and $args[0] eq '-global') {
-		no warnings 'once';
-		*MY::postamble = \&postamble;
+		if (!(@MM::ISA == 1 && $MM::ISA[0] eq 'ExtUtils::Builder::MakeMaker')) {
+			@ISA = @MM::ISA;
+			@MM::ISA = qw(ExtUtils::Builder::MakeMaker);
+		}
 	}
 	else {
 		goto &Exporter::import;
@@ -33,7 +36,8 @@ sub make_entry {
 
 sub postamble {
 	my ($maker, %args) = @_;
-	my (@ret, @all_deps);
+	my @ret = $maker->SUPER::postamble(%args);
+	my @all_deps;
 	if ($args{plans}) {
 		my @plans = ref $args{plans} eq 'ARRAY' ? @{ $args{plans} } : $args{plans};
 		for my $plan (@plans) {
@@ -60,14 +64,16 @@ sub postamble {
  use ExtUtils::MakeMaker;
  use ExtUtils::Builder::MakeMaker -global;
  ...
- my @plans = Frobnicator->new->plans;
  WriteMakeFile(
    NAME => 'Foo',
    VERSION => 0.001,
-   postamble => {
-     plans => \@plans,
-   }
  );
+
+ sub MY::postamble {
+   my ($self) = @_;
+   my @plans = Frobnicator->new->plans;
+   $self->SUPER::postamble(plans => \@plans);
+ }
 
 =head1 DESCRIPTION
 
@@ -81,22 +87,11 @@ This can be done by giving the use statement a C<-global> argument.
 
  use ExtUtils::Builder::MakeMaker -global;
 
-This will install ExtUtils::Builder::MakeMaker's as the global postamble. This is the easiest method of using it, but is not compatible with using other postamble extensions to MakeMaker. This is equivalend to:
-
- package MY;
- use ExtUtils::Builder::MakeMaker 'postamble';
+This will install ExtUtils::Builder::MakeMaker's as the global postamble. This is the easiest method of using it. You may want to combine it with a custom MY::postamble that creates the appropriate arguments and then calls C<$self->SUPER::postable(%arguments)>.
 
 =item * Non-global
 
-This usually means that you have your own postamble, which calls back this modules postambles and others, and concatenates them. For example:
-
- my @extensions = ('ExtUtils::Builder::MakeMaker', ...);
- load($_) for @extensions;
- my @methods = map { $_. "::postamble" } @extensions;
- sub MY::postamble {
-   my ($makemaker, %args) = @_;
-   return join "\n\n", map { $makemaker->$_(%args) } @methods;
- }
+This usually means that you have your own postamble, which calls back this modules postambles and others, and concatenates them.
 
 =back
 
