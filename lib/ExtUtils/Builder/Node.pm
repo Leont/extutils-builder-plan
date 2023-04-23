@@ -3,20 +3,31 @@ package ExtUtils::Builder::Node;
 use strict;
 use warnings;
 
-use base qw/ExtUtils::Builder::Action::Composite ExtUtils::Builder::Dependency/;
+use base qw/ExtUtils::Builder::Action::Composite/;
 
 use Carp 'croak';
 
 sub new {
 	my ($class, %args) = @_;
-	croak('Attribute actions is not defined') if not $args{actions};
-	$args{actions} = [ map { $_->flatten } @{ $args{actions} } ];
+	croak('Attribute target is not defined') if not $args{target};
+	$args{actions} = [ map { $_->flatten } @{ $args{actions} || [] } ];
+	$args{dependencies} ||= [];
 	return $class->SUPER::new(%args);
 }
 
 sub flatten {
 	my $self = shift;
 	return @{ $self->{actions} };
+}
+
+sub target {
+	my $self = shift;
+	return $self->{target};
+}
+
+sub dependencies {
+	my $self = shift;
+	return @{ $self->{dependencies} };
 }
 
 1;
@@ -33,7 +44,7 @@ sub flatten {
 
 =head1 DESCRIPTION
 
-A node is the equivalent of a makefile entry. In essence it boils down to its tree attributes. C<target> and C<dependencies> are composed from L<ExtUtils::Builder::Dependency|ExtUtils::Builder::Dependency>, and C<actions> contains all associated actions. A Node is a L<composite action|ExtUtils::Builder::Action::Composite>, meaning that in can be executed or serialized as a whole. Flattening is recommended before complex serializations. See L<ExtUtils::Builder::Action|ExtUtils::Builder::Action> for more details.
+A node is the equivalent of a makefile entry. In essence it boils down to its tree attributes. A Node is a L<composite action|ExtUtils::Builder::Action::Composite>, meaning that in can be executed or serialized as a whole, C<actions> contains all associated actions. C<target> and C<dependencies> contain the name of the target and the names of the dependencies.
 
 =attr target
 
