@@ -42,7 +42,7 @@ sub execute {
 	my @seenloop = ({}, {});
 	my $run_node = sub {
 		my ($name, $node) = @_;
-		return if -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
+		return if not $node->phony and -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
 		$node->execute(%options);
 	};
 	$self->_node_sorter($_, $run_node, @seenloop) for $self->roots;

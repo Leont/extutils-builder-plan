@@ -30,6 +30,11 @@ sub dependencies {
 	return @{ $self->{dependencies} };
 }
 
+sub phony {
+	my $self = shift;
+	return $self->{phone};
+}
+
 1;
 
 # ABSTRACT: An ExtUtils::Builder Node
@@ -53,6 +58,10 @@ The target filename of this node.
 =attr dependencies
 
 The (file)names of the dependencies of this node.
+
+=attr phony
+
+If true this node is phony, meaning that it will not produce a file and therefore will be run unconditionally.
 
 =method flatten
 
