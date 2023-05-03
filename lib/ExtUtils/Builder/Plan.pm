@@ -12,13 +12,23 @@ sub new {
 	my ($class, %args) = @_;
 	Carp::croak('Attribute roots is required') if not defined $args{roots};
 	$args{roots} = [ $args{roots} ] if ref($args{roots}) ne 'ARRAY';
-	$args{nodes} = { map { $_->target => $_ } @{ $args{nodes} || [] } };
+	$args{nodes} ||= {};
 	return $class->SUPER::new(%args);
+}
+
+sub node {
+	my ($self, $name) = @_;
+	return $self->{nodes}{$name};
 }
 
 sub nodes {
 	my $self = shift;
-	return values %{ $self->{nodes} };
+	return sort { $a->target cmp $b->target } values %{ $self->{nodes} };
+}
+
+sub node_names {
+	my $self = shift;
+	return sort keys %{ $self->{nodes} };
 }
 
 sub roots {
@@ -74,10 +84,10 @@ sub merge {
 
  package Frobnicate;
  sub plan {
-     my @nodes = ...;
+     my %nodes = ...;
      return ExtUtils::Builder::Plan->new(
          roots => [ 'foo' ],
-         nodes => \@nodes,
+         nodes => \%nodes,
      );
  }
 
