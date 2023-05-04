@@ -3,27 +3,20 @@ package ExtUtils::Builder::MakeMaker;
 use strict;
 use warnings;
 
-use Exporter;
-our @EXPORT_OK = qw/postamble make_entry escape_command/;
 our @ISA;
+
+use ExtUtils::MakeMaker;
+use ExtUtils::Builder::Planner;
+use ExtUtils::Builder::MakeMaker::Config;
 
 sub import {
 	my ($class, @args) = @_;
-	if (@args == 1 and $args[0] eq '-global') {
-		if (!(@MM::ISA == 1 && $MM::ISA[0] eq 'ExtUtils::Builder::MakeMaker')) {
-			@ISA = @MM::ISA;
-			@MM::ISA = qw(ExtUtils::Builder::MakeMaker);
-		}
-	}
-	else {
-		goto &Exporter::import;
+	if (!MM->isa('ExtUtils::Builder::MakeMaker')) {
+		@ISA = @MM::ISA;
+		@MM::ISA = qw/ExtUtils::Builder::MakeMaker/;
+		splice @ExtUtils::MakeMaker::Overridable, -1, 0, 'make_plans';
 	}
 	return;
-}
-
-sub get_config {
-	my ($maker) = @_;
-	return ExtUtils::Builder::MakeMaker::Config->new($maker);
 }
 
 sub escape_command {
@@ -42,21 +35,18 @@ sub make_entry {
 sub postamble {
 	my ($maker, %args) = @_;
 	my @ret = $maker->SUPER::postamble(%args);
-	my @all_deps;
-	if ($args{plans}) {
-		my @plans = ref $args{plans} eq 'ARRAY' ? @{ $args{plans} } : $args{plans};
-		for my $plan (@plans) {
-			push @all_deps, $plan->roots;
-			my @entries = sort { $a->target cmp $b->target } $plan->nodes;
-			push @ret, map { make_entry($maker, $_->target, [ $_->dependencies ], [ $_ ]) } @entries;
-		}
+
+	if ($maker->can('make_plans')) {
+		my $planner = ExtUtils::Builder::Planner->new;
+		my $config = ExtUtils::Builder::MakeMaker::Config->new($maker);
+		$maker->make_plans($planner, $config) ;
+		my $plan = $planner->plan;
+
+		push @ret, map { make_entry($maker, $_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
+
+		my $quote_dep = $maker->can('quote_dep') || sub { $_[1] };
+		unshift @ret, 'pure_all :: ' . join ' ', map { $maker->$quote_dep($_) } $plan->roots if $plan->roots;
 	}
-	if($args{actions}) {
-		push @all_deps, 'extra_actions';
-		push @ret, make_entry($maker, 'extra_actions', [], [ @{ $args{actions} } ]);
-	}
-	my $quote_dep = $maker->can('quote_dep') || sub { $_[1] };
-	unshift @ret, 'pure_all :: ' . join ' ', map { $maker->$quote_dep($_) } @all_deps if @all_deps;
 	return join "\n\n", @ret;
 }
 
@@ -67,47 +57,26 @@ sub postamble {
 =head1 SYNOPSIS
 
  use ExtUtils::MakeMaker;
- use ExtUtils::Builder::MakeMaker -global;
+ use ExtUtils::Builder::MakeMaker;
  ...
  WriteMakeFile(
    NAME => 'Foo',
    VERSION => 0.001,
  );
 
- sub MY::postamble {
-   my ($self) = @_;
-   my @plans = Frobnicator->new($self->get_config)->plans;
-   $self->SUPER::postamble(plans => \@plans);
+ sub MY::make_plans {
+   my ($self, $planner, $config) = @_;
+   ... # Add plans to $planner
  }
 
 =head1 DESCRIPTION
 
-This MakeMaker extension consumes ExtUtils::Builder::Plan objects, converting them into the Makefile. It's used by passing on the plans using the postamble.plans argument of WriteMakefile. It can be loaded in two ways, depending on your needs.
+This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it. These entries will be added to your Makefile. The roots, if any, will be added as dependencies of C<pure_all>.
 
-=over 4
+=begin Pod::Coverage
 
-=item * Global.
+postamble
+make_entry
+escape_command
 
-This can be done by giving the use statement a C<-global> argument.
-
- use ExtUtils::Builder::MakeMaker -global;
-
-This will install ExtUtils::Builder::MakeMaker's as the global postamble. This is the easiest method of using it. You may want to combine it with a custom MY::postamble that creates the appropriate arguments and then calls C<$self->SUPER::postable(%arguments)>.
-
-=item * Non-global
-
-This usually means that you have your own postamble, which calls back this modules postambles and others, and concatenates them.
-
-=back
-
-=func postamble($makemaker, %args)
-
-This generates a postamble for C<$makemaker> into a postamble section in the makefile from the plans in C<$args{plans}> and the actions in C<$args{actions}>.
-
-=func make_entry($makemaker, $target, $dependencies, $actions)
-
-This takes a build-triplet (C<$target, $dependencies, $actions>) and formats it into a makefile entry. C<$target> is supposed to be a simple string containing the name of the target. C<$dependencies> is an array-ref of strings containing the list of dependencies. C<$actions> is supposed to be an array-ref of L<Action|ExtUtils::Builder::Action> objects.
-
-=func escape_command($makemaker, $elements)
-
-Escape a command for inclusion in a makefile line. C<$elements> is an array-ref containing the elements of the command (e.g. C<['echo', 'Hello', 'World!']>).
+=end Pod::Coverage

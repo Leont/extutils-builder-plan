@@ -21,32 +21,30 @@ my $touch = join ', ', map { qq{'$_'} } @touch_prefix, 'touch';
 
 printf $mfpl <<'END', $touch;
 use ExtUtils::MakeMaker;
-use ExtUtils::Builder::MakeMaker -global;
-use ExtUtils::Builder::Node;
-use ExtUtils::Builder::Plan;
+use ExtUtils::Builder::MakeMaker;
 use ExtUtils::Builder::Action::Command;
 use ExtUtils::Builder::Action::Code;
 
-my $action1 = ExtUtils::Builder::Action::Command->new(command => [%s, 'very_unlikely_name']);
-my $action2 = ExtUtils::Builder::Action::Code->new(code => 'open my $fh, ">", "other_unlikely_name"');
-my $node = ExtUtils::Builder::Node->new(actions => [ $action1, $action2 ], dependencies => [], target => 'foo');
-my $plan = ExtUtils::Builder::Plan->new(nodes => [ $node ], roots => 'foo');
 
 WriteMakefile(
 	NAME => 'FOO',
 	VERSION => 0.001,
-	postamble => {
-		plans => [ $plan ],
-	},
 	NO_MYMETA => 1,
 	NO_META => 1,
 );
+
+sub MY::make_plans {
+	my ($self, $planner, $config) = @_;
+	my $action1 = ExtUtils::Builder::Action::Command->new(command => [%s, 'very_unlikely_name']);
+	my $action2 = ExtUtils::Builder::Action::Code->new(code => 'open my $fh, ">", "other_unlikely_name"');
+	$planner->create_node(target => 'foo', actions => [ $action1, $action2 ], root => 1);
+}
 
 END
 
 close $mfpl;
 
-system $^X, 'Makefile.PL';
+system $^X, '-d:Confess', 'Makefile.PL';
 
 ok(-e 'Makefile', 'Makefile exists');
 
