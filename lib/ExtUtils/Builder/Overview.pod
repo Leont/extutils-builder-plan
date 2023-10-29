@@ -115,9 +115,19 @@ The serialization methods will do pretty much what you expect them to do. The C<
  ...
 
  sub plans { 
-     my $action = ExtUtils::Builder::Action::Code->new(code => ...);
-     my $node = ExtUtils::Builder::Node->new(target => 'frob', actions => [ $action ]);
-     return ExtUtils::Builder::Plan->new(nodes => [ $node ], roots => 'frob');
+     my ($self, $planner) = @_;
+     my $action = ExtUtils::Builder::Action::Code->new(
+         code => ...,
+     );
+     $planner->create_node(
+         target => 'frob',
+         actions => [ $action ],
+     );
+     $planner->create_node(
+         target => 'pure_all',
+         dependencies => [ 'frob' ],
+         phony => 1,
+     );
  }
  ...
 
@@ -126,12 +136,13 @@ The serialization methods will do pretty much what you expect them to do. The C<
  use ExtUtils::MakeMaker;
  use ExtUtils::Builder::MakeMaker -global;
  ...
- my @plans = Frobnicator->new(@args)->plans;
  WriteMakeFile(
    NAME => 'Foo',
    VERSION => 0.001,
-   postamble => {
-     plans => \@plans,
-   }
+   ...,
  );
 
+ sub MY::make_plans {
+   my ($self, $planner, $config) = @_;
+   Frobnicator->add_plans($planner);
+ }

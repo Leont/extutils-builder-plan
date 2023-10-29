@@ -54,7 +54,7 @@ sub mergeable {
 
 =head1 DESCRIPTION
 
-A node is the equivalent of a makefile entry. In essence it boils down to its tree attributes. A Node is a L<composite action|ExtUtils::Builder::Action::Composite>, meaning that in can be executed or serialized as a whole, C<actions> contains all associated actions. C<target> and C<dependencies> contain the name of the target and the names of the dependencies.
+A node is the equivalent of a makefile entry. In essence it boils down to its three attributes: C<target> (the name of the target), C<dependencies>(the names of the dependencies) and C<actions>. A Node is a L<composite action|ExtUtils::Builder::Action::Composite>, meaning that in can be executed or serialized as a whole.
 
 =attr target
 

@@ -65,7 +65,7 @@ This Action class is a specialization of L<Action::Perl|ExtUtils::Builder::Actio
      message    => 'Calling Frob::nicate',
  );
 
-Except that is serializes more cleanly.
+Except that it serializes more cleanly.
 
 =attr arguments
 

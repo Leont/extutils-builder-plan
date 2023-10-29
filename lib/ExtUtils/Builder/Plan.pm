@@ -79,6 +79,7 @@ sub merge {
 1;
 
 # ABSTRACT: An ExtUtils::Builder Plan
+
 =head1 SYNOPSIS
 
  package Frobnicate;
@@ -95,7 +96,6 @@ sub merge {
  # various consumption methods
  $plan->execute;
  say $_->target for $plan->nodes;
- $backend->consume($plan);
 
 =head1 DESCRIPTION
 
@@ -124,6 +124,14 @@ Returns all commands in all actions in the nodes of the plan in a correct order.
 =method to_code
 
 Returns all code-strings in all actions in the nodes of the plan in a correct order.
+
+=method node($target)
+
+Returns the node for the specified C<$target>.
+
+=method node_names()
+
+Returns the names of all the nodes.
 
 =method merge($other)
 
