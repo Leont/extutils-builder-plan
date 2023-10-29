@@ -83,6 +83,11 @@ sub merge {
 	return ref($self)->new(nodes => [ values %nodes ], roots => \@roots);
 }
 
+sub phonies {
+	my ($self) = @_;
+	return sort map { $_->target } grep { $_->phony } values %{ $self->{nodes} };
+}
+
 1;
 
 # ABSTRACT: An ExtUtils::Builder Plan
@@ -143,6 +148,10 @@ Returns the names of all the nodes.
 =method merge($other)
 
 This merges this plan with another, and returns the new plan. Each entry may only exist on one side of the merge.
+
+=method phonies()
+
+This returns the names of all phony targets.
 
 =begin Pod::Coverage
 
