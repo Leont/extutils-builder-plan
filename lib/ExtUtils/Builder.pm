@@ -1,7 +1,11 @@
-#PODNAME: ExtUtils::Builder::Plan::Overview
-#ABSTRACT: An overview of the foundations of the ExtUtils::Builder Plan framework
+package ExtUtils::Builder;
 
-=pod
+use strict;
+use warnings;
+
+1;
+
+#ABSTRACT: An overview of the foundations of the ExtUtils::Builder Plan framework
 
 =head1 DESCRIPTION
 
