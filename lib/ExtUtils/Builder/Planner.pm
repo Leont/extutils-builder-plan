@@ -20,8 +20,14 @@ sub new {
 sub add_node {
 	my ($self, $node) = @_;
 	my $target = $node->target;
-	Carp::croak("Duplicate for target $target") if exists $self->{nodes}{$target};
-	$self->{nodes}{$target} = $node;
+	if (exists $self->{nodes}{$target}) {
+		Carp::croak("Duplicate for target $target") if !$node->mergeable or !$self->{nodes}{$target}->mergeable;
+		my @dependencies = List::Util::uniq($self->{nodes}{$target}->dependencies, $node->dependencies);
+		my $new = ExtUtils::Builder::Node->new(target => $target, dependencies => \@dependencies);
+		$self->{nodes}{$target} = $new;
+	} else {
+		$self->{nodes}{$target} = $node;
+	}
 	return $node->target;
 }
 

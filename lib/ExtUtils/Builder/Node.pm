@@ -35,6 +35,11 @@ sub phony {
 	return $self->{phone};
 }
 
+sub mergeable {
+	my $self = shift;
+	return $self->{phony} && !@{ $self->{actions} };
+}
+
 1;
 
 # ABSTRACT: An ExtUtils::Builder Node
@@ -78,3 +83,7 @@ This returns the list commands of all actions in the node.
 =method to_code
 
 This returns the list of evaluatable strings of all actions in the node.
+
+=method mergeable
+
+This returns true if a node is mergeable, i.e. it's phony and has no actions.
