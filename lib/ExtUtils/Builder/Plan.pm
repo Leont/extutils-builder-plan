@@ -23,7 +23,7 @@ sub node {
 
 sub nodes {
 	my $self = shift;
-	return sort { $a->target cmp $b->target } values %{ $self->{nodes} };
+	return @{$self->{nodes}}{ $self->node_names };
 }
 
 sub node_names {
@@ -49,21 +49,20 @@ sub _node_sorter {
 
 sub execute {
 	my ($self, %options) = @_;
-	my @seenloop = ({}, {});
+	my (%seen, %loop);
 	my $run_node = sub {
 		my ($name, $node) = @_;
 		return if not $node->phony and -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
 		$node->execute(%options);
 	};
-	$self->_node_sorter($_, $run_node, @seenloop) for $self->roots;
+	$self->_node_sorter($_, $run_node, \%seen, \%loop) for $self->roots;
 	return;
 }
 
 sub flatten {
 	my $self = shift;
-	my @ret;
-	my @seenloop = ({}, {});
-	$self->_node_sorter($_, sub { push @ret, $_[1]->flatten }, @seenloop) for $self->roots;
+	my (@ret, %seen, %loop);
+	$self->_node_sorter($_, sub { push @ret, $_[1]->flatten }, \%seen, \%loop) for $self->roots;
 	return @ret;
 }
 
