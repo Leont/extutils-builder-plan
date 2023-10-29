@@ -6,6 +6,7 @@ use warnings;
 use base 'ExtUtils::Builder::Action::Primitive';
 
 use Config;
+use Scalar::Util 'tainted';
 
 sub _preference_map {
 	return {
@@ -37,7 +38,7 @@ sub _get_perl {
 	}
 	else {
 		require File::Spec;
-		return $^X if File::Spec->file_name_is_absolute($^X);
+		return $^X if File::Spec->file_name_is_absolute($^X) and not tainted($^X);
 		return defined $opts{config} ? $opts{config}->get('perlpath') : $Config{perlpath};
 	}
 }
