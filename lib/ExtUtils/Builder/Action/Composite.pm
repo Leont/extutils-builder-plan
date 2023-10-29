@@ -16,18 +16,18 @@ sub _preference_map {
 
 sub execute {
 	my ($self, %opts) = @_;
-	$_->execute(%opts) for $self->flatten;
+	$_->execute(%opts) for $self->flatten(%opts);
 	return;
 }
 
 sub to_code {
 	my ($self, %opts) = @_;
-	return map { $_->to_code(%opts) } $self->flatten;
+	return map { $_->to_code(%opts) } $self->flatten(%opts);
 }
 
 sub to_command {
 	my ($self, %opts) = @_;
-	return map { $_->to_command(%opts) } $self->flatten;
+	return map { $_->to_command(%opts) } $self->flatten(%opts);
 }
 
 1;

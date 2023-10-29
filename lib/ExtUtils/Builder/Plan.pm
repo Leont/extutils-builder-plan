@@ -47,22 +47,29 @@ sub _node_sorter {
 	return;
 }
 
+sub _flat {
+	my $args = shift;
+	return ref($args) ? @{ $args } : $args;
+}
+
 sub execute {
 	my ($self, %options) = @_;
 	my (%seen, %loop);
+	my @targets = $options{targets} ? _flat($options{targets}) : $self->roots;
 	my $run_node = sub {
 		my ($name, $node) = @_;
 		return if not $node->phony and -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
 		$node->execute(%options);
 	};
-	$self->_node_sorter($_, $run_node, \%seen, \%loop) for $self->roots;
+	$self->_node_sorter($_, $run_node, \%seen, \%loop) for @targets;
 	return;
 }
 
 sub flatten {
-	my $self = shift;
+	my ($self, %options) = @_;
 	my (@ret, %seen, %loop);
-	$self->_node_sorter($_, sub { push @ret, $_[1]->flatten }, \%seen, \%loop) for $self->roots;
+	my @targets = $options{targets} ? _flat($options{targets}) : $self->roots;
+	$self->_node_sorter($_, sub { push @ret, $_[1]->flatten }, \%seen, \%loop) for @targets;
 	return @ret;
 }
 
@@ -113,9 +120,9 @@ This list contains one or more names of the roots of the process. This will be u
 
 This runs the process. Similar to C<make>, it checks for each node if it is necessary to run, and if not skips it.
 
-=method flatten
+=method flatten(targets => \@targets)
 
-This flattens the plan, returning the actions in the nodes of the plan in a correct order.
+This flattens the plan, returning the actions in the nodes of the plan in a correct order. If targets is given those targets will be processed, otherwise the roots will be.
 
 =method to_command
 
