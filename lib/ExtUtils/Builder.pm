@@ -114,11 +114,10 @@ The serialization methods will do pretty much what you expect them to do. The C<
  package Frobnicator;
  use ExtUtils::Builder::Action::Code;
  use ExtUtils::Builder::Node;
- use ExtUtils::Builder::Plan;
 
  ...
 
- sub plans { 
+ sub add_plans { 
      my ($self, $planner) = @_;
      my $action = ExtUtils::Builder::Action::Code->new(
          code => ...,
@@ -138,7 +137,7 @@ The serialization methods will do pretty much what you expect them to do. The C<
 =head2 Makefile.PL
 
  use ExtUtils::MakeMaker;
- use ExtUtils::Builder::MakeMaker -global;
+ use ExtUtils::Builder::MakeMaker;
  ...
  WriteMakeFile(
    NAME => 'Foo',
@@ -147,6 +146,6 @@ The serialization methods will do pretty much what you expect them to do. The C<
  );
 
  sub MY::make_plans {
-   my ($self, $planner, $config) = @_;
+   my ($self, $planner) = @_;
    Frobnicator->add_plans($planner);
  }

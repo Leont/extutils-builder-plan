@@ -7,7 +7,6 @@ our @ISA;
 
 use ExtUtils::MakeMaker;
 use ExtUtils::Builder::Planner;
-use ExtUtils::Builder::MakeMaker::Config;
 
 sub import {
 	my ($class, @args) = @_;
@@ -38,8 +37,7 @@ sub postamble {
 
 	if ($maker->can('make_plans')) {
 		my $planner = ExtUtils::Builder::Planner->new;
-		my $config = ExtUtils::Builder::MakeMaker::Config->new($maker);
-		$maker->make_plans($planner, $config) ;
+		$maker->make_plans($planner);
 		my $plan = $planner->plan;
 
 		push @ret, map { make_entry($maker, $_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
@@ -65,7 +63,7 @@ sub postamble {
  );
 
  sub MY::make_plans {
-   my ($self, $planner, $config) = @_;
+   my ($self, $planner) = @_;
    ... # Add plans to $planner
  }
 
