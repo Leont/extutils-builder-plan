@@ -9,8 +9,13 @@ use List::Util ();
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Node;
 
+my $class_counter = 0;
+
 sub new {
-	my $class = shift;
+	my $base_class = shift;
+	my $class = $base_class . '+' . ++$class_counter;
+	no strict 'refs';
+	push @{ "$class\::ISA" }, $base_class;
 	bless {
 		nodes => {},
 		roots => [],
@@ -48,6 +53,14 @@ sub add_plan {
 	my ($self, $plan) = @_;
 	$self->add_node($_) for $plan->nodes;
 	$self->add_root($_) for $plan->roots;
+	return;
+}
+
+sub add_delegate {
+	my ($self, $name, $sub) = @_;
+	my $full_name = ref($self) . '::' . $name;
+	no strict 'refs';
+	*{$full_name} = $sub;
 	return;
 }
 
@@ -94,6 +107,10 @@ This adds the given name to the list of roots.
 =method add_plan($plan)
 
 This adds all nodes and roots in the plan to the planner.
+
+=method add_delegate($name, $sub)
+
+This adds C<$sub> as a helper method to this planner, with the name C<$name>.
 
 =method plan()
 
