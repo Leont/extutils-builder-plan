@@ -40,10 +40,13 @@ sub _node_sorter {
 	my ($self, $name, $callback, $seen, $loop) = @_;
 	Carp::croak("$name has a circular dependency, aborting!\n") if exists $loop->{$name};
 	return if $seen->{$name}++;
-	my $node = $self->{nodes}{$name} or Carp::confess("Node $name doesn't exist");
-	local $loop->{$name} = 1;
-	$self->_node_sorter($_, $callback, $seen, $loop) for $node->dependencies;
-	$callback->($name, $node);
+	if (my $node = $self->{nodes}{$name}) {
+		local $loop->{$name} = 1;
+		$self->_node_sorter($_, $callback, $seen, $loop) for $node->dependencies;
+		$callback->($name, $node);
+	} elsif (not -e $name) {
+		Carp::confess("Node $name doesn't exist")
+	}
 	return;
 }
 
