@@ -64,6 +64,7 @@ sub postamble {
 
  sub MY::make_plans {
    my ($self, $planner) = @_;
+   $planner->load_module('Some::Module');
    ... # Add plans to $planner
  }
 

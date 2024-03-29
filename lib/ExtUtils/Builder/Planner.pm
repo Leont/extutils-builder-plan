@@ -64,6 +64,19 @@ sub add_delegate {
 	return;
 }
 
+sub _require_module {
+	my $module = shift;
+	(my $filename = "$module.pm") =~ s{::}{/}g;
+	require $filename;
+	return $module;
+}
+
+sub load_module {
+	my ($self, $plannable, %options) = @_;
+	_require_module($plannable);
+	return $plannable->add_methods($self, %options);
+}
+
 sub plan {
 	my $self = shift;
 	my %nodes = %{ $self->{nodes} };
@@ -88,10 +101,6 @@ sub plan {
 
 =head1 DESCRIPTION
 
-=method new()
-
-This creates a new planner object
-
 =method add_node($node)
 
 This adds an L<ExtUtils::Builder::Node|ExtUtils::Builder::Node> to the planner.
@@ -111,6 +120,10 @@ This adds all nodes and roots in the plan to the planner.
 =method add_delegate($name, $sub)
 
 This adds C<$sub> as a helper method to this planner, with the name C<$name>.
+
+=method load_module($extension, %options)
+
+This adds the delegate from the given module
 
 =method plan()
 
