@@ -77,7 +77,7 @@ sub load_module {
 	return $plannable->add_methods($self, %options);
 }
 
-sub plan {
+sub materialize {
 	my $self = shift;
 	my %nodes = %{ $self->{nodes} };
 	my @roots = List::Util::uniq(@{ $self->{roots} });
@@ -97,7 +97,7 @@ sub plan {
      actions      => \@actions,
      root         => 1,
  );
- my $plan = $planner->plan;
+ my $plan = $planner->materialize;
 
 =head1 DESCRIPTION
 
@@ -125,7 +125,7 @@ This adds C<$sub> as a helper method to this planner, with the name C<$name>.
 
 This adds the delegate from the given module
 
-=method plan()
+=method materialize()
 
 This returns a new L<ExtUtils::Builder::Plan|ExtUtils::Builder::Plan> object based on the planner.
 

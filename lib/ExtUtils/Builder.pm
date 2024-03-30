@@ -113,7 +113,6 @@ The serialization methods will do pretty much what you expect them to do. The C<
 
  package Frobnicator;
  use ExtUtils::Builder::Action::Code;
- use ExtUtils::Builder::Node;
 
  ...
 

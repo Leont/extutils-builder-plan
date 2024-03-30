@@ -38,7 +38,7 @@ sub postamble {
 	if ($maker->can('make_plans')) {
 		my $planner = ExtUtils::Builder::Planner->new;
 		$maker->make_plans($planner);
-		my $plan = $planner->plan;
+		my $plan = $planner->materialize;
 
 		push @ret, map { make_entry($maker, $_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
 
