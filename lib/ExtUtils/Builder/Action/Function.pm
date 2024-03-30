@@ -12,7 +12,6 @@ sub new {
 	croak 'Attribute function is not defined' if not defined $args{function};
 	$args{fullname} = join '::', $args{module}, $args{function};
 	$args{exports} ||= 0;
-	$args{message} ||= "Calling $args{fullname}";
 	$args{arguments} ||= [];
 	$args{modules} = [ $args{module} ];
 	my $self = $class->SUPER::new(%args);

@@ -24,8 +24,12 @@ sub modules {
 
 sub execute {
 	my ($self, %opts) = @_;
-	$opts{logger}->($self->{message}) if $opts{logger} && !$opts{quiet} && exists $self->{message};
-	eval $self->to_code() . '; 1' or die $@;
+	my $code = $self->to_code();
+	if ($opts{logger} && !$opts{quiet}) {
+		my $message = $self->{message} || $code;
+		$opts{logger}->($message);
+	}
+	eval $code . '; 1' or die $@;
 	return;
 }
 
@@ -41,12 +45,6 @@ sub _get_perl {
 		return $^X if File::Spec->file_name_is_absolute($^X) and not tainted($^X);
 		return defined $opts{config} ? $opts{config}->get('perlpath') : $Config{perlpath};
 	}
-}
-
-sub to_code {
-	my ($self, %opts) = @_;
-	my @modules = $opts{skip_loading} ? () : map { "require $_; " } $self->modules;
-	return join '', @modules, $self->code(%opts);
 }
 
 sub to_command {
