@@ -15,6 +15,17 @@ sub new {
 	return $self;
 }
 
+sub execute {
+	my ($self, %opts) = @_;
+	my $code = $self->to_code();
+	if ($opts{logger} && !$opts{quiet}) {
+		my $message = $self->{message} || $code;
+		$opts{logger}->($message);
+	}
+	eval $code . '; 1' or die $@;
+	return;
+}
+
 sub to_code {
 	my ($self, %opts) = @_;
 	my @modules = $opts{skip_loading} ? () : map { "require $_" } $self->modules;

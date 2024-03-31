@@ -22,17 +22,6 @@ sub modules {
 	return @{ $self->{modules} };
 }
 
-sub execute {
-	my ($self, %opts) = @_;
-	my $code = $self->to_code();
-	if ($opts{logger} && !$opts{quiet}) {
-		my $message = $self->{message} || $code;
-		$opts{logger}->($message);
-	}
-	eval $code . '; 1' or die $@;
-	return;
-}
-
 sub _get_perl {
 	my %opts = @_;
 	return $opts{perl} if $opts{perl};
