@@ -56,22 +56,12 @@ This is a primitive action object wrapping an external command. The easiest way 
 
 This is the command that should be run, represented as an array ref.
 
-=method execute(%args)
+=begin Pod::Coverage
 
-This executes the command immediately.
+execute
+to_command
+to_code
+preference
+flatten
 
-=method to_command()
-
-This returns the C<command> attribute.
-
-=method to_code
-
-This returns a piece of code that will run the command.
-
-=method preference
-
-This will prefer handling methods in the following order: command, execute, code, flatten
-
-=method flatten
-
-This returns the object.
+=end Pod::Coverage

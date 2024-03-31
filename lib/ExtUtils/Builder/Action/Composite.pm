@@ -40,7 +40,7 @@ This is a base-role for all composite action classes
 
 =method preference
 
-This will prefer handling methods in the following order: command, execute, code, flatten
+This will prefer handling methods in the following order: flatten, execute, command, code
 
 =method execute
 

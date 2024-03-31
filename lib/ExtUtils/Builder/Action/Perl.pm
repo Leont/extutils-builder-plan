@@ -54,18 +54,14 @@ This class provides most functionality of Code Actions.
 
 This is a message that will be logged during execution. This attribute is optional.
 
-=method execute(%opts)
-
-This executes the command immediately.
-
-=method to_command(%opts)
-
-This returns an arrayref containing a command for this action.
-
-=method preference
-
-This will prefer handling methods in the following order: execute, code, command, flatten
-
 =method modules
 
 This will return the modules needed for this action.
+
+=begin Pod::Coverage
+
+execute
+to_command
+preference
+
+=end Pod::Coverage

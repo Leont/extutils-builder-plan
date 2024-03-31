@@ -58,12 +58,9 @@ This is a code-ref containing the action. On execution, it is passed the argumen
 
 This is an optional list of modules that will be dynamically loaded before the action is run in any way. This attribute is optional.
 
-=method to_code
-
-This returns the code-string for this action.
-
 =begin Pod::Coverage
 
 new
+to_code
 
 =end Pod::Coverage

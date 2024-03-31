@@ -29,7 +29,7 @@ sub preference {
 
 =head1 DESCRIPTION
 
-Actions are the cornerstone of the ExtUtils::Builder framework. They provide an interface between build tools (L<ExtUtils::MakeMaker|ExtUtils::MakeMaker>, L<Module::Build|Module::Build>) and building extensions. This allows both sides to be completely independant from each other. It is a flexible abstraction around pieces of work, this work can be a piece of perl code, an external command, a mix of those or possibly other things.
+Actions are the cornerstone of the ExtUtils::Builder framework. They provide an interface between build tools (L<ExtUtils::MakeMaker|ExtUtils::MakeMaker>, L<Module::Build|Module::Build>) and building extensions. This allows both sides to be completely independent from each other. It is a flexible abstraction around pieces of work, this work can be a piece of perl code, an external command, a mix of those or possibly other things.
 
 =head1 OVERVIEW
 

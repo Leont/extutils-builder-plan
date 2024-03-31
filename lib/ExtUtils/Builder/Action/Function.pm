@@ -82,6 +82,8 @@ The name of the function to be called.
 
 If true, the function is assumed to be exported by the module.
 
-=method to_code
+=begin Pod::Coverage
 
-This returns a piece of code that will run the command.
+to_code
+
+=end Pod::Coverage

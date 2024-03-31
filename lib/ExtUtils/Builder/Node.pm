@@ -64,26 +64,23 @@ The target filename of this node.
 
 The (file)names of the dependencies of this node.
 
+=attr actions
+
+A list of L<actions|ExtUtils::Builder::Action> for this node.
+
 =attr phony
 
 If true this node is phony, meaning that it will not produce a file and therefore will be run unconditionally.
 
-=method flatten
-
-This returns the actions of this node.
-
-=method execute
-
-Execute all actions in this node.
-
-=method to_command
-
-This returns the list commands of all actions in the node.
-
-=method to_code
-
-This returns the list of evaluatable strings of all actions in the node.
-
 =method mergeable
 
 This returns true if a node is mergeable, i.e. it's phony and has no actions.
+
+=begin Pod::Coverage
+
+flatten
+execute
+to_command
+to_code
+
+=end Pod::Coverage
