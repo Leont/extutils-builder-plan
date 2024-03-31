@@ -88,6 +88,22 @@ sub materialize {
 my %builtins = map { $_ => 1 } qw/add_node create_node add_root add_plan add_delegate load_module run_dsl/;
 my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } || sub { $_[1] };
 
+my %dsl_commands = (
+	command => sub {
+		my (@command) = @_;
+		return ExtUtils::Builder::Action::Command->new(command => \@command);
+	},
+	code => sub {
+		my %args = @_;
+		return ExtUtils::Builder::Action::Code->new(%args);
+	},
+	function => sub {
+		my %args = @_;
+		return ExtUtils::Builder::Action::Code->new(%args);
+	},
+);
+$set_subname->($_, $dsl_commands{$_}) for keys %dsl_commands;
+
 sub run_dsl {
 	my ($self, $filename) = @_;
 	my $dsl_module = ref($self) . '::DSL';
@@ -107,6 +123,10 @@ sub run_dsl {
 			else {
 				Carp::croak("No such subroutine $name");
 			}
+		};
+
+		for my $name (keys %dsl_commands) {
+			*{ "$dsl_module\::$name" } = $dsl_commands{$name};
 		}
 	}
 
@@ -166,13 +186,19 @@ This runs C<$filename> as a DSL file. This is a script file that includes Planne
  create_node(
      target       => 'foo',
      dependencies => [ 'bar' ],
-     actions      => [ ... ],
+     actions      => [
+		command(qw/echo Hello World!/),
+		function(module => 'Foo', function => 'bar'),
+		code(code => 'print "Hello World"'),
+	 ],
      root         => 1,
  );
 
  load_module("Foo");
 
  add_foo("a.foo", "a.bar");
+
+This will also add C<command>, C<function> and C<code> helper functions that correspond to L<ExtUtils::Builder::Action::Command>, L<ExtUtils::Builder::Action::Function> and L<ExtUtils::Builder::Action::Code> respectively.
 
 =method materialize()
 
