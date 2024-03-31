@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp ();
+use File::Spec;
 use List::Util ();
 
 use ExtUtils::Builder::Plan;
@@ -13,7 +14,7 @@ my $class_counter = 0;
 
 sub new {
 	my $base_class = shift;
-	my $class = $base_class . '+' . ++$class_counter;
+	my $class = $base_class . '::Anon_' . ++$class_counter;
 	no strict 'refs';
 	push @{ "$class\::ISA" }, $base_class;
 	bless {
@@ -84,6 +85,36 @@ sub materialize {
 	return ExtUtils::Builder::Plan->new(nodes => \%nodes, roots => \@roots);
 }
 
+my %builtins = map { $_ => 1 } qw/add_node create_node add_root add_plan add_delegate load_module run_dsl/;
+my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } || sub { $_[1] };
+
+sub run_dsl {
+	my ($self, $filename) = @_;
+	my $dsl_module = ref($self) . '::DSL';
+
+	if (not $dsl_module->can('AUTOLOAD')) {
+		no strict 'refs';
+		*{ "$dsl_module\::AUTOLOAD" } = sub {
+			my $name = our $AUTOLOAD;
+			$name =~ s/.*:://;
+			if ($builtins{$name} || defined &{ ref($self) . "::$name"}) {
+				my $delegate = $set_subname->($name, sub {
+					$self->$name(@_);
+				});
+				*{ "$dsl_module\::$name" } = $delegate;
+				goto &$delegate;
+			}
+			else {
+				Carp::croak("No such subroutine $name");
+			}
+		}
+	}
+
+	my $path = File::Spec->file_name_is_absolute($filename) ? $filename : File::Spec->catfile(File::Spec->curdir, $filename);
+	eval "package $dsl_module; my \$ret = do \$path; die \$@ if \$@; defined \$ret || !\$!" or die $@ || Carp::shortmess("Can't run $path: $!");
+	return;
+}
+
 1;
 
 # ABSTRACT: An ExtUtils::Builder Plan builder
@@ -124,6 +155,24 @@ This adds C<$sub> as a helper method to this planner, with the name C<$name>.
 =method load_module($extension, %options)
 
 This adds the delegate from the given module
+
+=method run_dsl($filename)
+
+This runs C<$filename> as a DSL file. This is a script file that includes Planner methods as functions. For example:
+
+ use strict;
+ use warnings;
+
+ create_node(
+     target       => 'foo',
+     dependencies => [ 'bar' ],
+     actions      => [ ... ],
+     root         => 1,
+ );
+
+ load_module("Foo");
+
+ add_foo("a.foo", "a.bar");
 
 =method materialize()
 
