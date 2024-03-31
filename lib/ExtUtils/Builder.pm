@@ -43,6 +43,10 @@ It can take two optional named arguments: C<perl> for the path to perl, and C<co
 
 This converts the action into a list of strings to be C<eval>ed in order to execute them. This can be useful when you want to serialize the work that is to be done but don't want to force it to shell out.
 
+=item * to_code_hash()
+
+This converts the action into a hash that can be used to create a new L<ExtUtils::Builder::Action::Code>.
+
 =item * flatten()
 
 This will return all primitive actions involved in this action. It may return C<$self>, it may return an empty list.

@@ -16,6 +16,13 @@ sub preference {
 	return $ret;
 }
 
+sub to_code_hash {
+	my ($self, %opts) = @_;
+	return {
+		code => $self->to_code(%opts),
+	}
+}
+
 1;
 
 #ABSTRACT: The ExtUtils::Builder Action role
@@ -70,6 +77,10 @@ This should contain an ExtUtils::Config object, or equivalent.
 =method to_code(%options)
 
 This returns a list of strings that can be evalled to sub-refs. C<%options> can influence how something is serialized in action-type specific ways, but shouldn't fundamentally affect the action that is performed.
+
+=method to_code_hash(%options)
+
+This returns a list of hashes that can be used to create L<Action::Code|ExtUtils::Builder::Action::Code> objects.
 
 =method preference(@possibilities)
 

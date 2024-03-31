@@ -22,6 +22,11 @@ sub modules {
 	return @{ $self->{modules} };
 }
 
+sub message {
+	my $self = shift;
+	return $self->{message};
+}
+
 sub _get_perl {
 	my %opts = @_;
 	return $opts{perl} if $opts{perl};
@@ -40,6 +45,16 @@ sub to_command {
 	my ($self, %opts) = @_;
 	my @modules = map { "-M$_" } $self->modules;
 	return [ _get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
+}
+
+sub to_code_hash {
+	my ($self, %opts) = @_;
+	my %result = (
+		modules => [ $self->modules ],
+		code    => $self->to_code(skip_loading => 1, %opts),
+	);
+	$result{message} = $self->{message} if defined $self->{message};
+	return \%result;
 }
 
 1;
