@@ -25,6 +25,11 @@ sub execute {
 		require "$filename.pm";
 	}
 
+	if ($args{logger} && !$args{quiet}) {
+		my $message = $self->{message} || "$self->{fullname}(@{ $self->{arguments} })";
+		$args{logger}->($message);
+	}
+
 	my $code = do { no strict 'refs'; \&{ $self->{fullname} } };
 	$code->(@{ $self->{arguments} });
 }
