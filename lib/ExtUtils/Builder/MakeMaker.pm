@@ -37,15 +37,17 @@ sub postamble {
 	my ($maker, %args) = @_;
 	my @ret = $maker->SUPER::postamble(%args);
 
-	if ($maker->can('make_plans')) {
-		my $planner = ExtUtils::Builder::Planner->new;
-		$maker->make_plans($planner);
-		my $plan = $planner->materialize;
+	my $planner = ExtUtils::Builder::Planner->new;
 
-		push @ret, map { $maker->make_entry($_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
-
-		unshift @ret, $maker->make_entry('pure_all', [ $plan->roots ]) if $plan->roots;
+	$maker->make_plans($planner, %args) if $maker->can('make_plans');
+	for my $file (glob 'planner/*.pl') {
+		$planner->run_dsl($file);
 	}
+
+	my $plan = $planner->materialize;
+	push @ret, map { $maker->make_entry($_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
+	unshift @ret, $maker->make_entry('pure_all', [ $plan->roots ]) if $plan->roots;
+
 	return join "\n\n", @ret;
 }
 
@@ -71,7 +73,7 @@ sub postamble {
 
 =head1 DESCRIPTION
 
-This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. Entries may depend on existing MakeMaker entries and vice-versa; The roots, if any, will be added as dependencies of C<pure_all>.
+This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files. Entries may depend on existing MakeMaker entries and vice-versa; The roots, if any, will be added as dependencies of C<pure_all>.
 
 =begin Pod::Coverage
 
