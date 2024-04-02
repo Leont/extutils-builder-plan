@@ -17,18 +17,13 @@ sub _preference_map {
 	};
 }
 
-sub modules {
-	my $self = shift;
-	return @{ $self->{modules} };
-}
-
 sub message {
 	my $self = shift;
 	return $self->{message};
 }
 
 sub _get_perl {
-	my %opts = @_;
+	my ($self, %opts) = @_;
 	return $opts{perl} if $opts{perl};
 	if ($Config{userelocatableinc}) {
 		require Devel::FindPerl;
@@ -39,12 +34,6 @@ sub _get_perl {
 		return $^X if File::Spec->file_name_is_absolute($^X) and not tainted($^X);
 		return defined $opts{config} ? $opts{config}->get('perlpath') : $Config{perlpath};
 	}
-}
-
-sub to_command {
-	my ($self, %opts) = @_;
-	my @modules = map { "-M$_" } $self->modules;
-	return [ _get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 sub to_code_hash {

@@ -11,19 +11,22 @@ sub new {
 	croak 'Attribute module is not defined' if not defined $args{module};
 	croak 'Attribute function is not defined' if not defined $args{function};
 	$args{fullname} = join '::', $args{module}, $args{function};
-	$args{exports} ||= 0;
+	$args{exports} ||= !!0;
 	$args{arguments} ||= [];
-	$args{modules} = [ $args{module} ];
 	my $self = $class->SUPER::new(%args);
 	return $self;
 }
 
+sub modules {
+	my ($self) = @_;
+	return $self->{module};
+}
+
 sub execute {
 	my ($self, %args) = @_;
-	for my $module (@{ $self->{modules} }) {
-		(my $filename = $module) =~ s{::}{/}g;
-		require "$filename.pm";
-	}
+	my $module = $self->{module};
+	(my $filename = $module) =~ s{::}{/}g;
+	require "$filename.pm";
 
 	if ($args{logger} && !$args{quiet}) {
 		my $message = $self->{message} || "$self->{fullname}(@{ $self->{arguments} })";
@@ -38,11 +41,17 @@ sub to_code {
 	my ($self, %args) = @_;
 	my $shortcut = $args{skip_loading} && $args{skip_loading} eq 'main' && $self->{exports};
 	my $name = $shortcut ? $self->{function} : $self->{fullname};
-	my @modules = $args{skip_loading} ? () : map { "require $_" } $self->modules;
+	my @modules = $args{skip_loading} ? () : "require $self->{module}";
 	my $arguments = @{ $self->{arguments} } ? do {
 		require Data::Dumper; (Data::Dumper->new([ $self->{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \[ (.*) \] $/x)[0]
 	} : '';
 	return join '; ', @modules, sprintf '%s(%s)', $name, $arguments;
+}
+
+sub to_command {
+	my ($self, %opts) = @_;
+	my $module = $self->{exports} eq 'explicit' ? "-M$self->{module}=$self->{function}" : "-M$self->{module}";
+	return [ $self->_get_perl(%opts), $module, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;
@@ -85,7 +94,7 @@ The name of the function to be called.
 
 =attr exports 
 
-If true, the function is assumed to be exported by the module.
+If C<"always">, the function is assumed to be exported by the module. If C<"explicit">, it's assumed to need explicit exporting (e.g. C<use Module 'function';>).
 
 =begin Pod::Coverage
 

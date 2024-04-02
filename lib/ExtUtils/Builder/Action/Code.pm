@@ -15,6 +15,11 @@ sub new {
 	return $self;
 }
 
+sub modules {
+	my $self = shift;
+	return @{ $self->{modules} };
+}
+
 sub execute {
 	my ($self, %opts) = @_;
 	my $code = $self->to_code();
@@ -30,6 +35,12 @@ sub to_code {
 	my ($self, %opts) = @_;
 	my @modules = $opts{skip_loading} ? () : map { "require $_" } $self->modules;
 	return join '; ', @modules, $self->{code};
+}
+
+sub to_command {
+	my ($self, %opts) = @_;
+	my @modules = map { "-M$_" } $self->modules;
+	return [ $self->_get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;
@@ -62,5 +73,6 @@ This is an optional list of modules that will be dynamically loaded before the a
 
 new
 to_code
+modules
 
 =end Pod::Coverage
