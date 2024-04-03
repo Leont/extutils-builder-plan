@@ -3,7 +3,7 @@ package ExtUtils::Builder::Action::Command;
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Action::Primitive';
+use parent 'ExtUtils::Builder::Action::Primitive';
 
 sub _preference_map {
 	return {

@@ -3,7 +3,7 @@ package ExtUtils::Builder::Action::Primitive;
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Action';
+use parent 'ExtUtils::Builder::Action';
 
 sub flatten {
 	my $self = shift;

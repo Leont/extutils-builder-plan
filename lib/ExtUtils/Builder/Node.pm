@@ -3,7 +3,7 @@ package ExtUtils::Builder::Node;
 use strict;
 use warnings;
 
-use base qw/ExtUtils::Builder::Action::Composite/;
+use parent qw/ExtUtils::Builder::Action::Composite/;
 
 use Carp 'croak';
 

@@ -3,7 +3,7 @@ package ExtUtils::Builder::Action::Perl;
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Action::Primitive';
+use parent 'ExtUtils::Builder::Action::Primitive';
 
 use Config;
 use Scalar::Util 'tainted';

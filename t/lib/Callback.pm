@@ -3,7 +3,7 @@ package Callback;
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Planner::Extension';
+use parent 'ExtUtils::Builder::Planner::Extension';
 
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Action::Code;

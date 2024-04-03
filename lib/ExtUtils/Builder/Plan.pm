@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Scalar::Util ();
 
-use base 'ExtUtils::Builder::Action::Composite';
+use parent 'ExtUtils::Builder::Action::Composite';
 
 sub new {
 	my ($class, %args) = @_;
