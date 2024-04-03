@@ -35,7 +35,7 @@ my $make_entry = sub {
 
 sub postamble {
 	my ($maker, %args) = @_;
-	my @ret = $maker->SUPER::postamble(%args);
+	my @ret = split "\n\n", $maker->SUPER::postamble(%args);
 
 	my $planner = ExtUtils::Builder::Planner->new;
 
@@ -47,6 +47,11 @@ sub postamble {
 	my $plan = $planner->materialize;
 	push @ret, map { $maker->$make_entry($_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
 	unshift @ret, $maker->$make_entry('pure_all', [ $plan->roots ]) if $plan->roots;
+
+	if ($maker->is_make_type('gmake') || $maker->is_make_type('bsdmake')) {
+		my @phonies = grep { !$double_colon{$_} } $plan->phonies;
+		push @ret, $maker->$make_entry('.PHONY', \@phonies) if @phonies
+	}
 
 	return join "\n\n", @ret;
 }
