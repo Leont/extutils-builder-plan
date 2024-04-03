@@ -57,8 +57,15 @@ sub _flat {
 
 sub execute {
 	my ($self, %options) = @_;
+	$self->run([ $self->roots ], %options);
+	return;
+}
+
+sub run {
+	my ($self, $targets, %options) = @_;
+
+	my @targets = ref($targets) ? @{$targets} : $targets;
 	my (%seen, %loop);
-	my @targets = $options{targets} ? _flat($options{targets}) : $self->roots;
 	my $run_node = sub {
 		my ($name, $node) = @_;
 		return if not $node->phony and -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
@@ -109,12 +116,12 @@ sub phonies {
  my $plan = Frobnicate->plan(@args);
  
  # various consumption methods
- $plan->execute;
+ $plan->run('foo');
  say $_->target for $plan->nodes;
 
 =head1 DESCRIPTION
 
-An object of this class describes a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its <execute> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Action>, but you're unlikely to want to use it like that.
+An object of this class describes a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its C<run> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Action>, but you're unlikely to want to use it like that.
 
 =attr nodes
 
@@ -122,11 +129,15 @@ This is the set of all nodes in this plan.
 
 =attr roots
 
-This list contains one or more names of the roots of the process. This will be used as a starting point when running it.
+This list contains one or more names of the roots of the process. This will be used as a starting point when executing it.
 
-=method execute
+=method run($target, %options)
 
-This runs the process. Similar to C<make>, it checks for each node if it is necessary to run, and if not skips it.
+This runs the process. Similar to C<make>, it checks for each node if it is necessary to run, and if not skips it. C<$target> may either be a single string or an array ref of strings for the targets to run.
+
+=method execute(%options)
+
+This is equivalent to C<< $plan->run([ $plan->roots ], %options) >>.
 
 =method flatten(targets => \@targets)
 
