@@ -18,20 +18,20 @@ sub import {
 	return;
 }
 
-sub escape_command {
+my $escape_command = sub {
 	my ($maker, $elements) = @_;
 	return join ' ', map { (my $temp = m{[^\w/\$().-]} ? $maker->quote_literal($_) : $_) =~ s/\n/\\\n\t/g; $temp } @{$elements};
-}
+};
 
 my %double_colon = map { $_ => 1 } qw/all pure_all subdirs config dynamic static clean distdir test install/;
-sub make_entry {
+my $make_entry = sub {
 	my ($maker, $target, $dependencies, $actions) = @_;
-	my @commands = map { escape_command($maker, $_) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
+	my @commands = map { $maker->$escape_command($_) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
 	my $quote_dep = $maker->can('quote_dep') || sub { $_[1] };
 	my @dependencies = map { $maker->$quote_dep($_) } @{$dependencies};
 	my $colon = $double_colon{$target} ? '::' : ':';
 	return join "\n\t", join(' ', $target, $colon, @dependencies), @commands;
-}
+};
 
 sub postamble {
 	my ($maker, %args) = @_;
@@ -45,8 +45,8 @@ sub postamble {
 	}
 
 	my $plan = $planner->materialize;
-	push @ret, map { $maker->make_entry($_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
-	unshift @ret, $maker->make_entry('pure_all', [ $plan->roots ]) if $plan->roots;
+	push @ret, map { $maker->$make_entry($_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
+	unshift @ret, $maker->$make_entry('pure_all', [ $plan->roots ]) if $plan->roots;
 
 	return join "\n\n", @ret;
 }
@@ -78,7 +78,5 @@ This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUti
 =begin Pod::Coverage
 
 postamble
-make_entry
-escape_command
 
 =end Pod::Coverage
