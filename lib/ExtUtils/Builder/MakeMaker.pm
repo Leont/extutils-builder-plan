@@ -7,6 +7,7 @@ our @ISA;
 
 use ExtUtils::MakeMaker;
 use ExtUtils::Builder::Planner;
+use ExtUtils::Config::MakeMaker;
 
 sub import {
 	my ($class, @args) = @_;
@@ -38,6 +39,13 @@ sub postamble {
 	my @ret = split "\n\n", $maker->SUPER::postamble(%args);
 
 	my $planner = ExtUtils::Builder::Planner->new;
+	$planner->add_delegate('makemaker', sub { $maker });
+	my $config = ExtUtils::Config::MakeMaker->new($maker);
+	$planner->add_delegate('config', sub { $config });
+	$planner->add_delegate('dist_name', sub { $maker->{DIST_NAME} });
+	$planner->add_delegate('dist_version', sub { $maker->{VERSION} });
+	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
+	$planner->add_delegate('release_status', sub { $maker->{VERSION} =~ /_/ ? 'unstable' : 'stable' });
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
