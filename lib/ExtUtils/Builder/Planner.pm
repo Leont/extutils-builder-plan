@@ -14,12 +14,24 @@ my $class_counter = 0;
 
 sub new {
 	my $base_class = shift;
-	my $class = $base_class . '::Anon_' . ++$class_counter;
+	return $base_class->_new_scope($base_class, {});
+}
+
+sub _new_scope {
+	my ($self, $base_class, $nodes) = @_;
+
+	my $class = __PACKAGE__ . '::Anon_' . ++$class_counter;
 	no strict 'refs';
 	push @{ "$class\::ISA" }, $base_class;
+
 	bless {
-		nodes => {},
+		nodes => $nodes,
 	}, $class;
+}
+
+sub new_scope {
+	my ($self) = @_;
+	return $self->_new_scope(ref($self), $self->{nodes});
 }
 
 sub add_node {
@@ -75,7 +87,6 @@ sub materialize {
 	return ExtUtils::Builder::Plan->new(nodes => \%nodes);
 }
 
-my %builtins = map { $_ => 1 } qw/add_node create_node add_plan add_delegate load_module run_dsl/;
 my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } || sub { $_[1] };
 
 my %dsl_commands = (
@@ -96,16 +107,17 @@ $set_subname->($_, $dsl_commands{$_}) for keys %dsl_commands;
 
 sub run_dsl {
 	my ($self, $filename) = @_;
+
 	my $dsl_module = ref($self) . '::DSL';
 
-	if (not $dsl_module->can('AUTOLOAD')) {
+	if (not defined &{ "$dsl_module\::AUTOLOAD" }) {
 		no strict 'refs';
 		*{ "$dsl_module\::AUTOLOAD" } = sub {
 			my $name = our $AUTOLOAD;
 			$name =~ s/.*:://;
-			if ($builtins{$name} || defined &{ ref($self) . "::$name"}) {
+			if (my $method = $self->can($name)) {
 				my $delegate = $set_subname->($name, sub {
-					$self->$name(@_);
+					$self->$method(@_);
 				});
 				*{ "$dsl_module\::$name" } = $delegate;
 				goto &$delegate;
@@ -116,7 +128,7 @@ sub run_dsl {
 		};
 
 		for my $name (keys %dsl_commands) {
-			*{ "$dsl_module\::$name" } = $dsl_commands{$name};
+			*{ "$dsl_module\::$name" } = $dsl_commands{$name} if not $dsl_module->can($name);
 		}
 	}
 
@@ -160,6 +172,10 @@ This adds C<$sub> as a helper method to this planner, with the name C<$name>.
 =method load_module($extension, %options)
 
 This adds the delegate from the given module
+
+=method new_scope()
+
+This opens a new scope on the planner. It return a child planner that shared the build tree state with its parent, but any delegated added to it will not be added to the parent.
 
 =method run_dsl($filename)
 

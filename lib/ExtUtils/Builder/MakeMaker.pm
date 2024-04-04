@@ -49,7 +49,7 @@ sub postamble {
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
-		$planner->run_dsl($file);
+		$planner->new_scope->run_dsl($file);
 	}
 
 	my $plan = $planner->materialize;
@@ -85,7 +85,7 @@ sub postamble {
 
 =head1 DESCRIPTION
 
-This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files. Entries may depend on existing MakeMaker entries and vice-versa. Typically one would make their target a dependency of a MakeMaker entry like C<pure_all> or C<dynamic>.
+This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files, these are run in a new scope so delegates don't leak out. Entries may depend on existing MakeMaker entries and vice-versa. Typically one would make their target a dependency of a MakeMaker entry like C<pure_all> or C<dynamic>.
 
 =begin Pod::Coverage
 
