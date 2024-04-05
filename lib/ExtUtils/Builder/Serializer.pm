@@ -20,7 +20,6 @@ sub serialize_plan {
 
 	return {
 		nodes => \%nodes,
-		roots => [ $plan->roots ],
 	}
 }
 
@@ -61,7 +60,6 @@ sub deserialize_plan {
 
 	return ExtUtils::Builder::Plan->new(
 		nodes => \%nodes,
-		roots => [ @{ $serialized->{roots} } ],
 	);
 }
 

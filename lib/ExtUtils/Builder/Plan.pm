@@ -6,14 +6,11 @@ use warnings;
 use Carp ();
 use Scalar::Util ();
 
-use parent 'ExtUtils::Builder::Action::Composite';
-
 sub new {
 	my ($class, %args) = @_;
-	Carp::croak('Attribute roots is required') if not defined $args{roots};
-	$args{roots} = [ $args{roots} ] if ref($args{roots}) ne 'ARRAY';
-	$args{nodes} ||= {};
-	return $class->SUPER::new(%args);
+	return bless {
+		nodes => $args{nodes} || {}
+	}, $class;
 }
 
 sub node {
@@ -31,11 +28,6 @@ sub node_names {
 	return sort keys %{ $self->{nodes} };
 }
 
-sub roots {
-	my $self = shift;
-	return @{ $self->{roots} };
-}
-
 sub _node_sorter {
 	my ($self, $name, $callback, $seen, $loop) = @_;
 	Carp::croak("$name has a circular dependency, aborting!\n") if exists $loop->{$name};
@@ -47,17 +39,6 @@ sub _node_sorter {
 	} elsif (not -e $name) {
 		Carp::confess("Node $name doesn't exist")
 	}
-	return;
-}
-
-sub _flat {
-	my $args = shift;
-	return ref($args) ? @{ $args } : $args;
-}
-
-sub execute {
-	my ($self, %options) = @_;
-	$self->run([ $self->roots ], %options);
 	return;
 }
 
@@ -75,22 +56,13 @@ sub run {
 	return;
 }
 
-sub flatten {
-	my ($self, %options) = @_;
-	my (@ret, %seen, %loop);
-	my @targets = $options{targets} ? _flat($options{targets}) : $self->roots;
-	$self->_node_sorter($_, sub { push @ret, $_[1]->flatten }, \%seen, \%loop) for @targets;
-	return @ret;
-}
-
 sub merge {
 	my ($self, $other) = @_;
 	Carp::croak('Right side of merge is not a Plan') if not $other->isa(__PACKAGE__);
 	my $double = join ', ', grep { $other->{nodes}{$_} } keys %{ $self->{nodes} };
 	Carp::croak("Found key(s) $double on both sides of merge") if $double;
 	my %nodes = (%{ $self->{nodes} }, %{ $other->{nodes} });
-	my @roots = Scalar::Util::uniq(@{ $self->{roots} }, @{ $other->{roots} });
-	return ref($self)->new(nodes => [ values %nodes ], roots => \@roots);
+	return ref($self)->new(nodes => [ values %nodes ]);
 }
 
 sub phonies {
@@ -108,7 +80,6 @@ sub phonies {
  sub plan {
      my %nodes = ...;
      return ExtUtils::Builder::Plan->new(
-         roots => [ 'foo' ],
          nodes => \%nodes,
      );
  }
@@ -121,35 +92,15 @@ sub phonies {
 
 =head1 DESCRIPTION
 
-An object of this class describes a process. It contains one or more nodes, at least one of which is declared a root node. This is enough to describe whole building processes, in fact its C<run> method is a tiny C<make> engine. It also happens to be a full-blown L<action|ExtUtils::Builder::Action>, but you're unlikely to want to use it like that.
+An object of this class describes a process. It contains one or more nodes. This is enough to describe whole building processes, in fact its C<run> method is a tiny C<make> engine.
 
 =attr nodes
 
 This is the set of all nodes in this plan.
 
-=attr roots
-
-This list contains one or more names of the roots of the process. This will be used as a starting point when executing it.
-
 =method run($target, %options)
 
 This runs the process. Similar to C<make>, it checks for each node if it is necessary to run, and if not skips it. C<$target> may either be a single string or an array ref of strings for the targets to run.
-
-=method execute(%options)
-
-This is equivalent to C<< $plan->run([ $plan->roots ], %options) >>.
-
-=method flatten(targets => \@targets)
-
-This flattens the plan, returning the actions in the nodes of the plan in a correct order. If targets is given those targets will be processed, otherwise the roots will be.
-
-=method to_command
-
-Returns all commands in all actions in the nodes of the plan in a correct order.
-
-=method to_code
-
-Returns all code-strings in all actions in the nodes of the plan in a correct order.
 
 =method node($target)
 

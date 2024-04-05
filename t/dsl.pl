@@ -9,6 +9,5 @@ create_node(
 	target => 'foo',
 	dependencies => [ map { "foo$_" } 0..2 ],
 	phony => 1,
-	root => 1,
 );
 

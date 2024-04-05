@@ -20,12 +20,11 @@ $planner->create_node(
 	target => 'foo',
 	dependencies => [ map { "foo$_" } 0..2 ],
 	phony => 1,
-	root => 1,
 );
 
 my $plan = $planner->materialize;
 
-lives_ok { $plan->execute } 'Executing gave no errors';
+lives_ok { $plan->run('foo') } 'Executing gave no errors';
 
 is_deeply(\@triggered, [ 0..2 ], 'All actions triggered');
 

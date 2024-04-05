@@ -13,7 +13,7 @@ my $planner = ExtUtils::Builder::Planner->new;
 $planner->run_dsl('t/dsl.pl');
 my $plan = $planner->materialize;
 
-lives_ok { $plan->execute } 'Executing gave no errors';
+lives_ok { $plan->run('foo') } 'Executing gave no errors';
 
 our @triggered;
 is_deeply(\@triggered, [ 0..2 ], 'All actions triggered');

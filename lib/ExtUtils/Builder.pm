@@ -75,7 +75,7 @@ Composite actions are actions that may consist out of multiple actions (though i
 
 =head3 Nodes
 
-Nodes the first type of composite Actions. Nodes are a simple class with three attributes:
+Nodes are composite Actions. Nodes are a simple class with three attributes:
 
 =over 4
 
@@ -95,9 +95,9 @@ This is a sequence of zero or more actions that must be performed to build the t
 
 Essentially, a Node is equivalent to entry in a Makefile
 
-=head3 Plans
+=head2 Plans
 
-Plans are the equivalent of a (piece of a) Makefile. They are a bunch of nodes that should interconnect. It has two attributes.
+Plans are the equivalent of a (piece of a) Makefile. They are a bunch of nodes that should interconnect. It has one attribute.
 
 =over 4
 
@@ -105,13 +105,9 @@ Plans are the equivalent of a (piece of a) Makefile. They are a bunch of nodes t
 
 This is a hash mapping (target) names to nodes. 
 
-=item * roots
-
-This is a list of root nodes that will be used to traverse the graph.
-
 =back
 
-The serialization methods will do pretty much what you expect them to do. The C<execute> method on the other hand will not simple serially do their thing like one may naively suspect, but instead will perform a topological sort much like C<make>. It will check which steps are necessary and skip the ones which are not.
+The C<run> method will perform a topological sort much like C<make>. It will check which steps are necessary and skip the ones which are not.
 
 =head1 USAGE
 

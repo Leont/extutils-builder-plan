@@ -54,7 +54,6 @@ sub postamble {
 
 	my $plan = $planner->materialize;
 	push @ret, map { $maker->$make_entry($_->target, [ $_->dependencies ], [ $_ ]) } $plan->nodes;
-	unshift @ret, $maker->$make_entry('pure_all', [ $plan->roots ]) if $plan->roots;
 
 	if ($maker->is_make_type('gmake') || $maker->is_make_type('bsdmake')) {
 		my @phonies = grep { !$double_colon{$_} } $plan->phonies;
@@ -86,7 +85,7 @@ sub postamble {
 
 =head1 DESCRIPTION
 
-This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files. Entries may depend on existing MakeMaker entries and vice-versa; The roots, if any, will be added as dependencies of C<pure_all>.
+This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files. Entries may depend on existing MakeMaker entries and vice-versa. Typically one would make their target a dependency of a MakeMaker entry like C<pure_all> or C<dynamic>.
 
 =begin Pod::Coverage
 
