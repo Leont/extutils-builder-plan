@@ -22,6 +22,21 @@ sub modules {
 	return $self->{module};
 }
 
+sub module {
+	my ($self) = @_;
+	return $self->{module};
+}
+
+sub function {
+	my ($self) = @_;
+	return $self->{function};
+}
+
+sub arguments {
+	my ($self) = @_;
+	return @{ $self->{arguments} };
+}
+
 sub execute {
 	my ($self, %args) = @_;
 	my $module = $self->{module};
@@ -29,12 +44,12 @@ sub execute {
 	require "$filename.pm";
 
 	if ($args{logger} && !$args{quiet}) {
-		my $message = $self->{message} || "$self->{fullname}(@{ $self->{arguments} })";
+		my $message = $self->{message} || sprintf "%s(%s)", $self->{fullname}, join ", ", $self->arguments;
 		$args{logger}->($message);
 	}
 
 	my $code = do { no strict 'refs'; \&{ $self->{fullname} } };
-	$code->(@{ $self->{arguments} });
+	$code->($self->arguments);
 }
 
 sub to_code {
@@ -42,8 +57,8 @@ sub to_code {
 	my $shortcut = $args{skip_loading} && $args{skip_loading} eq 'main' && $self->{exports};
 	my $name = $shortcut ? $self->{function} : $self->{fullname};
 	my @modules = $args{skip_loading} ? () : "require $self->{module}";
-	my $arguments = @{ $self->{arguments} } ? do {
-		require Data::Dumper; (Data::Dumper->new([ $self->{arguments} ])->Terse(1)->Indent(0)->Dump =~ /^ \[ (.*) \] $/x)[0]
+	my $arguments = $self->arguments ? do {
+		require Data::Dumper; (Data::Dumper->new([ [ $self->arguments ] ])->Terse(1)->Indent(0)->Dump =~ /^ \[ (.*) \] $/x)[0]
 	} : '';
 	return join '; ', @modules, sprintf '%s(%s)', $name, $arguments;
 }
