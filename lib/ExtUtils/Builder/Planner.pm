@@ -54,6 +54,15 @@ sub create_node {
 	return $self->add_node($node);
 }
 
+sub create_phony {
+	my ($self, $target, @dependencies) = @_;
+	return $self->create_node(
+		target       => $target,
+		dependencies => \@dependencies,
+		phony        => 1,
+	);
+}
+
 sub add_plan {
 	my ($self, $plan) = @_;
 	$self->add_node($_) for $plan->nodes;
@@ -161,6 +170,26 @@ This adds an L<ExtUtils::Builder::Node|ExtUtils::Builder::Node> to the planner.
 
 This creates a new node and adds it to the planner using C<add_node>. It takes the same named arguments as C<ExtUtils::Builder::Node>.
 
+=over 4
+
+=item * target
+
+The target of the node. This is mandatory.
+
+=item * dependencies
+
+The list of dependencies for this node.
+
+=item * actions
+
+The actions to perform to create or update this node.
+
+=item * phony
+
+A boolean to mark a target as phony. This defaults to false.
+
+=back
+
 =method add_plan($plan)
 
 This adds all nodes in the plan to the planner.
@@ -168,6 +197,10 @@ This adds all nodes in the plan to the planner.
 =method add_delegate($name, $sub)
 
 This adds C<$sub> as a helper method to this planner, with the name C<$name>.
+
+=method create_phony($target, @dependencies)
+
+This is a helper function that calls C<create_node> for a action-free phony target.
 
 =method load_module($extension, %options)
 
