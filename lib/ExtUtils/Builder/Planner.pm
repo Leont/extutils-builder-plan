@@ -40,7 +40,7 @@ sub add_node {
 	if (exists $self->{nodes}{$target}) {
 		Carp::croak("Duplicate for target $target") if !$node->mergeable or !$self->{nodes}{$target}->mergeable;
 		my @dependencies = List::Util::uniq($self->{nodes}{$target}->dependencies, $node->dependencies);
-		my $new = ExtUtils::Builder::Node->new(target => $target, dependencies => \@dependencies);
+		my $new = ExtUtils::Builder::Node->new(target => $target, dependencies => \@dependencies, phony => 1);
 		$self->{nodes}{$target} = $new;
 	} else {
 		$self->{nodes}{$target} = $node;

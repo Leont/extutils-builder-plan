@@ -29,6 +29,7 @@ sub serialize_node {
 	return {
 		dependencies => [ $node->dependencies ],
 		actions      => \@actions,
+		phony        => $node->phony,
 	}
 }
 
@@ -72,6 +73,7 @@ sub deserialize_node {
 		target       => $name,
 		dependencies => [ @{ $serialized->{dependencies} } ],
 		actions      => \@actions,
+		phony        => $serialized->{phony},
 	);
 }
 
