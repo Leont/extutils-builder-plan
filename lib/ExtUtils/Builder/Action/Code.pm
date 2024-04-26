@@ -6,6 +6,7 @@ use warnings;
 use parent 'ExtUtils::Builder::Action::Perl';
 
 use Carp ();
+use ExtUtils::Builder::Util 'get_perl';
 
 sub new {
 	my ($class, %args) = @_;
@@ -40,7 +41,7 @@ sub to_code {
 sub to_command {
 	my ($self, %opts) = @_;
 	my @modules = map { "-M$_" } $self->modules;
-	return [ $self->_get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
+	return [ get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;

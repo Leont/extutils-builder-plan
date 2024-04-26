@@ -5,9 +5,6 @@ use warnings;
 
 use parent 'ExtUtils::Builder::Action::Primitive';
 
-use Config;
-use Scalar::Util 'tainted';
-
 sub _preference_map {
 	return {
 		execute => 3,
@@ -20,20 +17,6 @@ sub _preference_map {
 sub message {
 	my $self = shift;
 	return $self->{message};
-}
-
-sub _get_perl {
-	my ($self, %opts) = @_;
-	return $opts{perl} if $opts{perl};
-	if ($Config{userelocatableinc}) {
-		require Devel::FindPerl;
-		return Devel::FindPerl::find_perl_interpreter($opts{config});
-	}
-	else {
-		require File::Spec;
-		return $^X if File::Spec->file_name_is_absolute($^X) and not tainted($^X);
-		return defined $opts{config} ? $opts{config}->get('perlpath') : $Config{perlpath};
-	}
 }
 
 sub to_code_hash {

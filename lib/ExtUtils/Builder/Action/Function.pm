@@ -2,7 +2,9 @@ package ExtUtils::Builder::Action::Function;
 
 use strict;
 use warnings;
+
 use Carp 'croak';
+use ExtUtils::Builder::Util 'get_perl';
 
 use parent 'ExtUtils::Builder::Action::Perl';
 
@@ -66,7 +68,7 @@ sub to_code {
 sub to_command {
 	my ($self, %opts) = @_;
 	my $module = $self->{exports} eq 'explicit' ? "-M$self->{module}=$self->{function}" : "-M$self->{module}";
-	return [ $self->_get_perl(%opts), $module, '-e', $self->to_code(skip_loading => 'main') ];
+	return [ get_perl(%opts), $module, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;
