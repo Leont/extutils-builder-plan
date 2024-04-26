@@ -45,7 +45,7 @@ END
 
 close $mfpl;
 
-system $^X, '-d:Confess', 'Makefile.PL';
+system $^X, 'Makefile.PL';
 
 ok(-e 'Makefile', 'Makefile exists');
 
