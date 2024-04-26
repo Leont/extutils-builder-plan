@@ -26,6 +26,13 @@ sub get_perl {
 	}
 }
 
+sub require_module {
+	my $module = shift;
+	(my $filename = "$module.pm") =~ s{::}{/}g;
+	require $filename;
+	return $module;
+}
+
 1;
 
 # ABSTRACT: Utility functions for ExtUtils::Builder
@@ -49,3 +56,7 @@ The location of the perl executable
 An L<ExtUtils::Config|ExtUtils::Config> (compatible) object.
 
 =back
+
+=func require_module($module)
+
+Dynamically require a module.

@@ -9,6 +9,7 @@ use List::Util ();
 
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Node;
+use ExtUtils::Builder::Util;
 
 my $class_counter = 0;
 
@@ -77,16 +78,9 @@ sub add_delegate {
 	return;
 }
 
-sub _require_module {
-	my $module = shift;
-	(my $filename = "$module.pm") =~ s{::}{/}g;
-	require $filename;
-	return $module;
-}
-
 sub load_module {
 	my ($self, $plannable, %options) = @_;
-	_require_module($plannable);
+	ExtUtils::Builder::Util::require_module($plannable);
 	return $plannable->add_methods($self, %options);
 }
 
