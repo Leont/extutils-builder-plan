@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 use File::Spec;
-use List::Util ();
+use List::Util 1.45 ();
 
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Node;
