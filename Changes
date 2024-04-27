@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Don't test for exact perl paths
 
 0.002     2024-04-26 11:33:00+02:00 Europe/Brussels
           - Move get_perl into ExtUtils::Builder::Util
