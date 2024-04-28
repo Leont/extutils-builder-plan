@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Fix Windows MakeMaker quoting
 
 0.004     2024-04-27 12:01:16+02:00 Europe/Brussels
           - Add dependency on List::Util 1.45 for uniq
