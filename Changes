@@ -3,6 +3,7 @@ Revision history for ExtUtils-Builder
 {{$NEXT}}
           - Revert "Fix Windows MakeMaker quoting"
           - Add workaround for Windows test failures
+          - Depend on MakeMaker 6.68 for quote_dep
 
 0.005     2024-04-28 13:01:57+02:00 Europe/Brussels
           - Fix Windows MakeMaker quoting

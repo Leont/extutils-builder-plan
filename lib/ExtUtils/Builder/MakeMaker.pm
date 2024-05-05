@@ -5,7 +5,7 @@ use warnings;
 
 our @ISA;
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
 use ExtUtils::Config::MakeMaker;
 
@@ -28,8 +28,7 @@ my %double_colon = map { $_ => 1 } qw/all pure_all subdirs config dynamic static
 my $make_entry = sub {
 	my ($maker, $target, $dependencies, $actions) = @_;
 	my @commands = map { $maker->$escape_command($_) } map { $_->to_command(perl => '$(ABSPERLRUN)') } @{$actions};
-	my $quote_dep = $maker->can('quote_dep') || sub { $_[1] };
-	my @dependencies = map { $maker->$quote_dep($_) } @{$dependencies};
+	my @dependencies = map { $maker->quote_dep($_) } @{$dependencies};
 	my $colon = $double_colon{$target} ? '::' : ':';
 	return join "\n\t", join(' ', $target, $colon, @dependencies), @commands;
 };
