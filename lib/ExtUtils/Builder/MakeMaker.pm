@@ -11,9 +11,9 @@ use ExtUtils::Config::MakeMaker;
 
 sub import {
 	my ($class, @args) = @_;
-	if (!MM->isa('ExtUtils::Builder::MakeMaker')) {
+	if (!MM->isa(__PACKAGE__)) {
 		@ISA = @MM::ISA;
-		@MM::ISA = qw/ExtUtils::Builder::MakeMaker/;
+		@MM::ISA = __PACKAGE__;
 		splice @ExtUtils::MakeMaker::Overridable, -1, 0, 'make_plans';
 	}
 	return;
