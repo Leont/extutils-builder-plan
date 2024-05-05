@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Revert "Fix Windows MakeMaker quoting"
 
 0.005     2024-04-28 13:01:57+02:00 Europe/Brussels
           - Fix Windows MakeMaker quoting
