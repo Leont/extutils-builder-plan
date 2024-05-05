@@ -44,11 +44,17 @@ sub postamble {
 	$planner->add_delegate('dist_name', sub { $maker->{DIST_NAME} });
 	$planner->add_delegate('dist_version', sub { $maker->{VERSION} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
-	$planner->add_delegate('release_status', sub { $maker->{VERSION} =~ /_/ ? 'unstable' : 'stable' });
+	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
+	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
+	$planner->add_delegate('meta', sub { CPAN::Meta->load_file('META.json') });
+	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
-		$planner->new_scope->run_dsl($file);
+		my $inner = $planner->new_scope;
+		$inner->add_delegate('self', sub { $inner });
+		$inner->add_delegate('outer', sub { $planner });
+		$inner->run_dsl($file);
 	}
 
 	my $plan = $planner->materialize;
