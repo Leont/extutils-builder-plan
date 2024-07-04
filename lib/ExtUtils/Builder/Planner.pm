@@ -79,8 +79,9 @@ sub add_delegate {
 }
 
 sub load_module {
-	my ($self, $plannable, %options) = @_;
+	my ($self, $plannable, $version, %options) = @_;
 	ExtUtils::Builder::Util::require_module($plannable);
+	$plannable->VERSION($version) if $version;
 	return $plannable->add_methods($self, %options);
 }
 
