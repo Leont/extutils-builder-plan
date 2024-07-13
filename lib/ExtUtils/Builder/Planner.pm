@@ -197,9 +197,9 @@ This adds C<$sub> as a helper method to this planner, with the name C<$name>.
 
 This is a helper function that calls C<create_node> for a action-free phony target.
 
-=method load_module($extension, %options)
+=method load_module($extension, $version, %options)
 
-This adds the delegate from the given module
+This adds the delegate from the given module. If C<$version> is defined it will verify if the extension is at least that version.
 
 =method new_scope()
 
