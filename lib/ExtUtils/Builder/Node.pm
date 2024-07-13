@@ -32,7 +32,7 @@ sub dependencies {
 
 sub phony {
 	my $self = shift;
-	return $self->{phone};
+	return !!$self->{phony};
 }
 
 sub mergeable {
