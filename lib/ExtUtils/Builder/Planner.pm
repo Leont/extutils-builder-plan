@@ -104,7 +104,7 @@ my %dsl_commands = (
 	},
 	function => sub {
 		my %args = @_;
-		return ExtUtils::Builder::Action::Code->new(%args);
+		return ExtUtils::Builder::Action::Function->new(%args);
 	},
 );
 $set_subname->($_, $dsl_commands{$_}) for keys %dsl_commands;
