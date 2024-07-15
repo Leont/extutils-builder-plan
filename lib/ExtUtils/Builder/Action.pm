@@ -48,10 +48,6 @@ Execute this action immediately. This may throw an exception on errors, but does
 
 =over 4
 
-=item * logger
-
-This is a callback subref that messages may be written to while executing
-
 =item * quiet
 
 If true, this suppresses logging.

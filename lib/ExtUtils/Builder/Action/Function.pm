@@ -45,9 +45,9 @@ sub execute {
 	(my $filename = $module) =~ s{::}{/}g;
 	require "$filename.pm";
 
-	if ($args{logger} && !$args{quiet}) {
+	if (!$args{quiet}) {
 		my $message = $self->{message} || sprintf "%s(%s)", $self->{fullname}, join ", ", $self->arguments;
-		$args{logger}->($message);
+		print "$message\n";
 	}
 
 	my $code = do { no strict 'refs'; \&{ $self->{fullname} } };

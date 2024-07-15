@@ -24,9 +24,9 @@ sub modules {
 sub execute {
 	my ($self, %opts) = @_;
 	my $code = $self->to_code();
-	if ($opts{logger} && !$opts{quiet}) {
+	if (!$opts{quiet}) {
 		my $message = $self->{message} || $code;
-		$opts{logger}->($message);
+		print "$message\n";
 	}
 	eval $code . '; 1' or die $@;
 	return;
