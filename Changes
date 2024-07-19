@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Add single arg command option
 
 0.008     2024-07-15 21:02:09+02:00 Europe/Brussels
           - Fix function() helper in DSLs

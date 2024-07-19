@@ -47,7 +47,7 @@ sub serialize_code {
 
 sub serialize_command {
 	my ($self, $action, %opts) = @_;
-	return map { [ 'command', @$_ ] } $action->to_command(%opts)
+	return map { [ 'command', $_ ] } $action->to_command(%opts)
 }
 
 
@@ -82,7 +82,7 @@ sub deserialize_action {
 	my ($command, @args) = @{$serialized};
 
 	if ($command eq 'command') {
-		return ExtUtils::Builder::Action::Command->new(command => \@args);
+		return ExtUtils::Builder::Action::Command->new(command => $args[0]);
 	} elsif ($command eq 'code') {
 		return map { ExtUtils::Builder::Action::Code->new(%$_) } @args;
 	} else {
