@@ -48,6 +48,13 @@ sub postamble {
 	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
 	$planner->add_delegate('meta', sub { CPAN::Meta->load_file('META.json') });
 	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });
+	$planner->add_delegate('jobs', sub { 1 });
+
+	$planner->add_delegate('new_planner', sub {
+		my $inner = ExtUtils::Builder::Planner->new;
+		$inner->add_delegate('config', sub { $config });
+		return $inner;
+	});
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
