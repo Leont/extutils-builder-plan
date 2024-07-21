@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_perl/;
+our @EXPORT_OK = qw/get_perl require_module/;
 
 use Config;
 use ExtUtils::Config;
