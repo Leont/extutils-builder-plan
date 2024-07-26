@@ -74,6 +74,7 @@ sub add_delegate {
 	my ($self, $name, $sub) = @_;
 	my $full_name = ref($self) . '::' . $name;
 	no strict 'refs';
+	no warnings 'redefine';
 	*{$full_name} = $sub;
 	return;
 }
