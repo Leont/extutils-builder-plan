@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Fix CRLF translation for Windows in test
 
 0.009     2024-08-01 12:54:19+02:00 Europe/Brussels
           - Add single arg command option

@@ -39,7 +39,7 @@ use Test::LivesOK 'lives_ok';
 	like($action->to_code, qr/ system \( 'echo\ Hello\ World' \) \ and \ die /x, 'to_code returns something that might be sensible');
 
 	open my $stdout, '>&', *STDOUT or die;
-	open my $temp, '+>', undef or die;
+	open my $temp, '+>:raw', undef or die;
 	open STDOUT, '>&', $temp or die;
 	open my $messenger, '>', \my $message;
 	select $messenger;
