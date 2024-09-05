@@ -49,7 +49,14 @@ sub run {
 	my (%seen, %loop);
 	my $run_node = sub {
 		my ($name, $node) = @_;
-		return if not $node->phony and -e $name and sub { -d or -M $name <= -M or return 0 for sort $node->dependencies; 1 }->();
+		return if not $node->phony and -e $name and sub {
+			for (sort $node->dependencies) {
+				my $dep = $self->{nodes}{$_};
+				return 0 if $dep && $dep->phony;
+				-d or (-e && -M $name <= -M) or return 0 ;
+			}
+			1;
+		}->();
 		$node->execute(%options);
 	};
 	$self->_node_sorter($_, $run_node, \%seen, \%loop) for @targets;

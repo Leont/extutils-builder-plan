@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Allow for phony dependencies of file targets
 
 0.011     2024-08-04 20:37:12+02:00 Europe/Brussels
           - Fix CRLF translation for Windows further
