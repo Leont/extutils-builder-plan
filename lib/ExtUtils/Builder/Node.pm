@@ -40,6 +40,12 @@ sub mergeable {
 	return $self->{phony} && !@{ $self->{actions} };
 }
 
+sub newer_than {
+	my ($self, $mtime) = @_;
+	return 1 if $self->{phony};
+	return -d $self->{target} || (-e _ && $mtime <= -M _);
+}
+
 1;
 
 # ABSTRACT: An ExtUtils::Builder Node
@@ -48,7 +54,7 @@ sub mergeable {
 
  ExtUtils::Builder::Node->new(
      target       => $target_name,
-     dependencies => \@dependencies
+     dependencies => \@dependencies,
      actions      => \@actions,
  );
 
@@ -82,5 +88,6 @@ flatten
 execute
 to_command
 to_code
+newer_than
 
 =end Pod::Coverage

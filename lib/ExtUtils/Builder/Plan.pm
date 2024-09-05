@@ -49,18 +49,25 @@ sub run {
 	my (%seen, %loop);
 	my $run_node = sub {
 		my ($name, $node) = @_;
-		return if not $node->phony and -e $name and sub {
-			for (sort $node->dependencies) {
-				my $dep = $self->{nodes}{$_};
-				return 0 if $dep && $dep->phony;
-				-d or (-e && -M $name <= -M) or return 0 ;
-			}
-			1;
-		}->();
+		return if $self->_up_to_date($node);
 		$node->execute(%options);
 	};
 	$self->_node_sorter($_, $run_node, \%seen, \%loop) for @targets;
 	return;
+}
+
+sub _up_to_date {
+	my ($self, $node) = @_;
+	return 0 if $node->phony or not -e $node->target;
+	my $mtime = -M _;
+	for my $dep_name (sort $node->dependencies) {
+		if (my $dep = $self->{nodes}{$dep_name}) {
+			return 0 unless $dep->newer_than($mtime);
+		} else {
+			return 0 unless -e $dep_name && $mtime <= -M _;
+		}
+	}
+	return 1;
 }
 
 sub merge {
