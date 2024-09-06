@@ -12,6 +12,7 @@ sub new {
 	croak('Attribute target is not defined') if not $args{target};
 	$args{actions} = [ map { $_->flatten } @{ $args{actions} || [] } ];
 	$args{dependencies} ||= [];
+	$args{type} ||= delete $args{phony} ? 'phony' : 'file';
 	return $class->SUPER::new(%args);
 }
 
@@ -30,19 +31,24 @@ sub dependencies {
 	return @{ $self->{dependencies} };
 }
 
+sub type {
+	my $self = shift;
+	return $self->{type};
+}
+
 sub phony {
 	my $self = shift;
-	return !!$self->{phony};
+	return $self->{type} eq 'phony';
 }
 
 sub mergeable {
 	my $self = shift;
-	return $self->{phony} && !@{ $self->{actions} };
+	return $self->{type} eq 'phony' && !@{ $self->{actions} };
 }
 
 sub newer_than {
 	my ($self, $mtime) = @_;
-	return 1 if $self->{phony};
+	return 1 if $self->{type} eq 'phony';
 	return -d $self->{target} || (-e _ && $mtime <= -M _);
 }
 
@@ -74,9 +80,15 @@ The (file)names of the dependencies of this node.
 
 A list of L<actions|ExtUtils::Builder::Action> for this node.
 
+=attr type
+
+This must be one of C<file> or C<phony>. In the latter case the target will not be represented on the filesystem.
+
 =attr phony
 
-If true this node is phony, meaning that it will not produce a file and therefore will be run unconditionally.
+B<Deprecated>.
+
+Instead, pass C<< type => 'phony' >>
 
 =method mergeable
 

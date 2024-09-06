@@ -60,7 +60,7 @@ sub create_phony {
 	return $self->create_node(
 		target       => $target,
 		dependencies => \@dependencies,
-		phony        => 1,
+		type         => 'phony',
 	);
 }
 
@@ -180,9 +180,9 @@ The list of dependencies for this node.
 
 The actions to perform to create or update this node.
 
-=item * phony
+=item * type
 
-A boolean to mark a target as phony. This defaults to false.
+This marks the type of the node: C<file> or C<phony>, defaulting to the former.
 
 =back
 

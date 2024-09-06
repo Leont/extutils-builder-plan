@@ -58,7 +58,7 @@ sub run {
 
 sub _up_to_date {
 	my ($self, $node) = @_;
-	return 0 if $node->phony or not -e $node->target;
+	return 0 if $node->type eq 'phony' or not -e $node->target;
 	my $mtime = -M _;
 	for my $dep_name (sort $node->dependencies) {
 		if (my $dep = $self->{nodes}{$dep_name}) {
