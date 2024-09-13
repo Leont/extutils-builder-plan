@@ -70,12 +70,14 @@ sub add_plan {
 	return;
 }
 
+my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } || sub { $_[1] };
+
 sub add_delegate {
 	my ($self, $name, $sub) = @_;
 	my $full_name = ref($self) . '::' . $name;
 	no strict 'refs';
 	no warnings 'redefine';
-	*{$full_name} = $sub;
+	*{$full_name} = $set_subname->($full_name, $sub);
 	return;
 }
 
@@ -91,8 +93,6 @@ sub materialize {
 	my %nodes = %{ $self->{nodes} };
 	return ExtUtils::Builder::Plan->new(nodes => \%nodes);
 }
-
-my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } || sub { $_[1] };
 
 my %dsl_commands = (
 	command => sub {
