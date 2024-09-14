@@ -10,9 +10,9 @@ use Carp 'croak';
 sub new {
 	my ($class, %args) = @_;
 	croak('Attribute target is not defined') if not $args{target};
-	$args{actions} = [ map { $_->flatten } @{ $args{actions} || [] } ];
-	$args{dependencies} ||= [];
-	$args{type} ||= delete $args{phony} ? 'phony' : 'file';
+	$args{actions} = [ map { $_->flatten } @{ $args{actions} // [] } ];
+	$args{dependencies} //= [];
+	$args{type} //= delete $args{phony} ? 'phony' : 'file';
 	return $class->SUPER::new(%args);
 }
 

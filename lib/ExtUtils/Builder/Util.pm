@@ -14,7 +14,7 @@ use Scalar::Util 'tainted';
 sub get_perl {
 	my (%opts) = @_;
 	return $opts{perl} if $opts{perl};
-	my $config = $opts{config} || ExtUtils::Config->new;
+	my $config = $opts{config} // ExtUtils::Config->new;
 	if ($config->get('userelocatableinc')) {
 		require Devel::FindPerl;
 		return Devel::FindPerl::find_perl_interpreter($config);

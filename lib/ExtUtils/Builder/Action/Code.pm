@@ -11,7 +11,7 @@ use ExtUtils::Builder::Util 'get_perl';
 sub new {
 	my ($class, %args) = @_;
 	Carp::croak('Need to define code') if !$args{code};
-	$args{modules} ||= [];
+	$args{modules} //= [];
 	my $self = $class->SUPER::new(%args);
 	return $self;
 }
@@ -25,7 +25,7 @@ sub execute {
 	my ($self, %opts) = @_;
 	my $code = $self->to_code();
 	if (!$opts{quiet}) {
-		my $message = $self->{message} || $code;
+		my $message = $self->{message} // $code;
 		print "$message\n";
 	}
 	eval $code . '; 1' or die $@;

@@ -70,7 +70,7 @@ sub add_plan {
 	return;
 }
 
-my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } || sub { $_[1] };
+my $set_subname = eval { require Sub::Util; Sub::Util->VERSION('1.40'); \&Sub::Util::set_subname } // sub { $_[1] };
 
 sub add_delegate {
 	my ($self, $name, $sub) = @_;
@@ -138,7 +138,7 @@ sub run_dsl {
 	}
 
 	my $path = File::Spec->file_name_is_absolute($filename) ? $filename : File::Spec->catfile(File::Spec->curdir, $filename);
-	eval "package $dsl_module; my \$ret = do \$path; die \$@ if \$@; defined \$ret || !\$!" or die $@ || Carp::shortmess("Can't run $path: $!");
+	eval "package $dsl_module; my \$ret = do \$path; die \$@ if \$@; defined \$ret || !\$!" or die $@ // Carp::shortmess("Can't run $path: $!");
 	return;
 }
 

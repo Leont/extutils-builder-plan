@@ -9,7 +9,7 @@ use Scalar::Util ();
 sub new {
 	my ($class, %args) = @_;
 	return bless {
-		nodes => $args{nodes} || {}
+		nodes => $args{nodes} // {}
 	}, $class;
 }
 

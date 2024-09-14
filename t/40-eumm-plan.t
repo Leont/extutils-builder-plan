@@ -55,7 +55,7 @@ my $content = do { local $/; <$mf> };
 
 like($content, qr/^\t .* touch .* very_unlikely_name/xm, 'Makefile contains very_unlikely_name');
 
-my $make = $ENV{MAKE} || $Config{make};
+my $make = $ENV{MAKE} // $Config{make};
 system $make;
 ok(-e 'very_unlikely_name', "Unlikely file has been touched");
 ok(-e 'other_unlikely_name', "Unlikely file has been touched");

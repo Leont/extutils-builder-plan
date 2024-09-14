@@ -14,7 +14,7 @@ sub new {
 	croak 'Attribute function is not defined' if not defined $args{function};
 	$args{fullname} = join '::', $args{module}, $args{function};
 	$args{exports} ||= !!0;
-	$args{arguments} ||= [];
+	$args{arguments} //= [];
 	my $self = $class->SUPER::new(%args);
 	return $self;
 }
@@ -46,7 +46,7 @@ sub execute {
 	require "$filename.pm";
 
 	if (!$args{quiet}) {
-		my $message = $self->{message} || sprintf "%s(%s)", $self->{fullname}, join ", ", $self->arguments;
+		my $message = $self->{message} // sprintf "%s(%s)", $self->{fullname}, join ", ", $self->arguments;
 		print "$message\n";
 	}
 
