@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_perl require_module/;
+our @EXPORT_OK = qw/get_perl require_module command code function/;
 
 use Config;
 use ExtUtils::Config;
@@ -33,6 +33,24 @@ sub require_module {
 	return $module;
 }
 
+sub command {
+	my (@command) = @_;
+	require ExtUtils::Builder::Action::Command;
+	return ExtUtils::Builder::Action::Command->new(command => \@command);
+}
+
+sub code {
+	my %args = @_;
+	require ExtUtils::Builder::Action::Code;
+	return ExtUtils::Builder::Action::Code->new(%args);
+}
+
+sub function {
+	my %args = @_;
+	require ExtUtils::Builder::Action::Function;
+	return ExtUtils::Builder::Action::Function->new(%args);
+}
+
 1;
 
 # ABSTRACT: Utility functions for ExtUtils::Builder
@@ -40,6 +58,18 @@ sub require_module {
 =head1 DESCRIPTION
 
 This is a module containing some helper functions for L<ExtUtils::Builder>.
+
+=func function(%arguments)
+
+This is a shorthand for calling L<ExtUtils::Builder::Action::Function|ExtUtils::Builder::Action::Function>'s contructor.
+
+=func command(%arguments)
+
+This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Builder::Action::Code>'s contructor.
+
+=func code(@command)
+
+This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Builder::Action::Code>'s contructor, with C<@command> passed as its C<command> argument.
 
 =func get_perl(%options)
 

@@ -95,20 +95,10 @@ sub materialize {
 }
 
 my %dsl_commands = (
-	command => sub {
-		my (@command) = @_;
-		return ExtUtils::Builder::Action::Command->new(command => \@command);
-	},
-	code => sub {
-		my %args = @_;
-		return ExtUtils::Builder::Action::Code->new(%args);
-	},
-	function => sub {
-		my %args = @_;
-		return ExtUtils::Builder::Action::Function->new(%args);
-	},
+	command  => \&ExtUtils::Builder::Util::command,
+	code     => \&ExtUtils::Builder::Util::code,
+	function => \&ExtUtils::Builder::Util::function,
 );
-$set_subname->($_, $dsl_commands{$_}) for keys %dsl_commands;
 
 sub run_dsl {
 	my ($self, $filename) = @_;
