@@ -13,15 +13,16 @@ use Scalar::Util 'tainted';
 
 sub get_perl {
 	my (%opts) = @_;
-	return $opts{perl} if $opts{perl};
 	my $config = $opts{config} // ExtUtils::Config->new;
-	if ($config->get('userelocatableinc')) {
+
+	if (file_name_is_absolute($^X) and not tainted($^X)) {
+		return $^X;
+	}
+	elsif ($config->get('userelocatableinc')) {
 		require Devel::FindPerl;
 		return Devel::FindPerl::find_perl_interpreter($config);
 	}
 	else {
-		require File::Spec;
-		return $^X if file_name_is_absolute($^X) and not tainted($^X);
 		return $opts{config}->get('perlpath');
 	}
 }
@@ -76,10 +77,6 @@ This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Buil
 This function takes a hash with various (optional) keys:
 
 =over 4
-
-=item * perl
-
-The location of the perl executable
 
 =item * config
 

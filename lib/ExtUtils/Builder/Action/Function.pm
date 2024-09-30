@@ -68,7 +68,8 @@ sub to_code {
 sub to_command {
 	my ($self, %opts) = @_;
 	my $module = $self->{exports} eq 'explicit' ? "-M$self->{module}=$self->{function}" : "-M$self->{module}";
-	return [ get_perl(%opts), $module, '-e', $self->to_code(skip_loading => 'main') ];
+	my $perl = $opts{perl} // get_perl(%opts);
+	return [ $perl, $module, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;

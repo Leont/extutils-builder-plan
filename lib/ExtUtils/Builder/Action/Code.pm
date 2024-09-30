@@ -41,7 +41,8 @@ sub to_code {
 sub to_command {
 	my ($self, %opts) = @_;
 	my @modules = map { "-M$_" } $self->modules;
-	return [ get_perl(%opts), @modules, '-e', $self->to_code(skip_loading => 'main') ];
+	my $perl = $opts{perl} // get_perl(%opts);
+	return [ $perl, @modules, '-e', $self->to_code(skip_loading => 'main') ];
 }
 
 1;
