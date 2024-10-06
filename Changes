@@ -1,6 +1,8 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+
+0.013     2024-10-06 15:44:28+02:00 Europe/Brussels
           - Add code/command/function helper functions to ExtUtils::Builder::Util
           - Add main_module helper to ExtUtils::Builder::MakeMaker
           - Rename dist_name to distribution in ExtUtils::Builder::MakeMaker
