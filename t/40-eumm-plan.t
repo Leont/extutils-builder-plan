@@ -10,8 +10,6 @@ use Cwd qw/getcwd/;
 use File::Temp qw/tempdir/;
 use ExtUtils::Builder::Util 'get_perl';
 
-system $^X, '-e0' and plan(skip_all => 'Can\'t find perl');
-
 my $tempdir = tempdir(CLEANUP => 1, TEMPLATE => 'ExtUtilsBuilderXXXX');
 
 my $pwd = getcwd;
@@ -47,7 +45,7 @@ END
 
 close $mfpl;
 
-system $^X, 'Makefile.PL';
+system get_perl(), 'Makefile.PL';
 
 ok(-e 'Makefile', 'Makefile exists');
 
