@@ -127,7 +127,7 @@ sub run_dsl {
 		}
 	}
 
-	my $path = File::Spec->file_name_is_absolute($filename) ? $filename : File::Spec->catfile(File::Spec->curdir, $filename);
+	my $path = File::Spec->rel2abs($filename);
 	eval "package $dsl_module; my \$ret = do \$path; die \$@ if \$@; defined \$ret || !\$!" or die $@ // Carp::shortmess("Can't run $path: $!");
 	return;
 }

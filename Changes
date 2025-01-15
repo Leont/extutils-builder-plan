@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Use absolute paths inside run_dsl
           - Remove tempdir in t/40-eumm-plan.t
 
 0.013     2024-10-06 15:44:28+02:00 Europe/Brussels
