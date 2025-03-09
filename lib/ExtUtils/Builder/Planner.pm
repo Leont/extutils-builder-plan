@@ -6,33 +6,40 @@ use warnings;
 use Carp ();
 use File::Spec;
 use List::Util 1.45 ();
+use Scalar::Util ();
 
 use ExtUtils::Builder::Plan;
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Util;
 
+use ExtUtils::Builder::FileSet::Free;
+use ExtUtils::Builder::FileSet::Filter;
+use ExtUtils::Builder::FileSet::Subst;
+
 my $class_counter = 0;
 
 sub new {
 	my $base_class = shift;
-	return $base_class->_new_scope($base_class, {});
+	my $all_files = ExtUtils::Builder::FileSet::Free->new;
+	return $base_class->_new_scope($base_class, {}, { 'all-files' => $all_files });
 }
 
 sub _new_scope {
-	my ($self, $base_class, $nodes) = @_;
+	my ($self, $base_class, $nodes, $filesets) = @_;
 
 	my $class = __PACKAGE__ . '::Anon_' . ++$class_counter;
 	no strict 'refs';
 	push @{ "$class\::ISA" }, $base_class;
 
 	bless {
-		nodes => $nodes,
+		nodes    => $nodes,
+		filesets => $filesets
 	}, $class;
 }
 
 sub new_scope {
 	my ($self) = @_;
-	return $self->_new_scope(ref($self), $self->{nodes});
+	return $self->_new_scope(ref($self), $self->{nodes}, $self->{filesets});
 }
 
 sub add_node {
@@ -45,6 +52,7 @@ sub add_node {
 		$self->{nodes}{$target} = $new;
 	} else {
 		$self->{nodes}{$target} = $node;
+		$self->{filesets}{'all-files'}->add_input($target) if not $node->phony;
 	}
 	return $node->target;
 }
@@ -62,6 +70,53 @@ sub create_phony {
 		dependencies => \@dependencies,
 		type         => 'phony',
 	);
+}
+
+my $counter = 0;
+
+sub _create_callback {
+	my ($self, $add_to) = @_;
+	return undef unless $add_to;
+	my $this = $self;
+	Scalar::Util::weaken($this);
+	return sub {
+		my ($entry) = @_;
+		$this->create_phony($add_to, $entry);
+	};
+}
+
+sub create_filter {
+	my ($self, %args) = @_;
+	my $set = ExtUtils::Builder::FileSet::Filter->new(
+		condition => $args{condition},
+		callback  => $self->_create_callback($args{add_to}),
+	);
+	my $on = $args{on} // 'all-files';
+	my @sources = ref($on) eq 'ARRAY' ? @{$on} : $on;
+	for my $source (@sources) {
+		my $object = $self->{filesets}{$source} or die "No such source $source";
+		$object->add_dependent($set);
+	}
+	my $name = $args{name} // 'filter-' . $counter++;
+	$self->{filesets}{$name} = $set;
+	return $name;
+}
+
+sub create_subst {
+	my ($self, %args) = @_;
+	my $set = ExtUtils::Builder::FileSet::Subst->new(
+		subst     => $args{subst},
+		callback  => $self->_create_callback($args{add_to}),
+	);
+	my $on = $args{on} // 'all-files';
+	my @sources = ref($on) eq 'ARRAY' ? @{$on} : $on;
+	for my $source (@sources) {
+		my $object = $self->{filesets}{$source} or die "No such source $source";
+		$object->add_dependent($set);
+	}
+	my $name = $args{name} // 'subst-' . $counter++;
+	$self->{filesets}{$name} = $set;
+	return $name;
 }
 
 sub add_plan {
@@ -150,7 +205,7 @@ sub run_dsl {
 
 =method add_node($node)
 
-This adds an L<ExtUtils::Builder::Node|ExtUtils::Builder::Node> to the planner.
+This adds an L<ExtUtils::Builder::Node|ExtUtils::Builder::Node> to the planner. It will also be added to the C<'all-files'> fileset if it's a file node.
 
 =method create_node(%args)
 
@@ -187,6 +242,54 @@ This adds C<$sub> as a helper method to this planner, with the name C<$name>.
 =method create_phony($target, @dependencies)
 
 This is a helper function that calls C<create_node> for a action-free phony target.
+
+=method create_filter(%options)
+
+This will filter an existing fileset based on a condition, and return the name of the new fileset.
+
+=over 4
+
+=item * condition
+
+If this callback returns true the file will be included in the new filesets.
+
+=item * on
+
+this sets the input fileset, it defaults to c<'all-files'>.
+
+=item * name
+
+this sets the name of the new set, if none is given one will be generated.
+
+=back
+
+=method create_subst(%options)
+
+This creates a new node based on the old one (source).
+
+=over 4
+
+=item * subst
+
+This callback is called for all entries in the input set. It should do two things:
+
+=over 4
+
+=item 1. Return the name of the new target node.
+
+=item 2. It should add a node to create the target from the source. The node should have source as its dependency.
+
+=back
+
+=item * on
+
+this sets the input fileset, it defaults to c<'all-files'>.
+
+=item * name
+
+this sets the name of the new set, if none is given one will be generated.
+
+=back
 
 =method load_module($extension, $version, %options)
 

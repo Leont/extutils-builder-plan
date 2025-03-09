@@ -6,6 +6,7 @@ use warnings;
 use Exporter 5.57 'import';
 our @EXPORT_OK = qw/get_perl require_module unix_to_native_path native_to_unix_path command code function/;
 
+use Carp 'croak';
 use Config;
 use ExtUtils::Config;
 use File::Spec;
@@ -53,6 +54,65 @@ sub function {
 	return ExtUtils::Builder::Action::Function->new(%args);
 }
 
+my %cache;
+sub glob_to_regex {
+	my $input = shift;
+	return $cache{$input} ||= do {
+		my $regex = _glob_to_regex_string($input);
+		qr/^$regex$/;
+	};
+}
+
+sub _glob_to_regex_string {
+	my $glob = shift;
+	my $in_curlies;
+	local $_ = $glob;
+
+	my $regex = !/\A(?=\.)/ ? '(?=[^\.])' : '';
+	while (!/\G\z/mgc) {
+		if (/\G([^\/.()|+^\$@%\\*?{},\[\]]+)/gc) {
+			$regex .= $1;
+		}
+		elsif (m{\G/}gc) {
+			$regex .= !/\G(?=\.)/gc ? '/(?=[^\.])' : '/'
+		}
+		elsif (/ \G ( [.()|+^\$@%] ) /xmgc) {
+			$regex .= quotemeta $1;
+		}
+		elsif (/ \G \\ ( [*?{}\\,] ) /xmgc) {
+			$regex .= quotemeta $1;
+		}
+		elsif (/\G\*/mgc) {
+			$regex .= "[^/]*";
+		}
+		elsif (/\G\?/mgc) {
+			$regex .= "[^/]";
+		}
+		elsif (/\G\{/mgc) {
+			$regex .= "(";
+			++$in_curlies;
+		}
+		elsif (/\G \[ ( [^\]]+ ) \] /xgc) {
+			$regex .= "[\Q$1\E]";
+		}
+		elsif ($in_curlies && /\G\}/mgc) {
+			$regex .= ")";
+			--$in_curlies;
+		}
+		elsif ($in_curlies && /\G,/mgc) {
+			$regex .= "|";
+		}
+		elsif (/\G([},]+)/gc) {
+			$regex .= $1;
+		}
+		else {
+			croak sprintf "Couldn't parse at %s|%s", substr($_, 0 , pos), substr $_, pos;
+		}
+	}
+
+	return $regex;
+}
+
 sub unix_to_native_path {
 	my ($input) = @_;
 	my ($volume, $unix_dir, $file) = File::Spec::Unix->splitpath($input);
@@ -88,6 +148,10 @@ This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Buil
 =func code(@command)
 
 This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Builder::Action::Code>'s contructor, with C<@command> passed as its C<command> argument.
+
+=func glob_to_regex($glob)
+
+This translates a unix glob expression (e.g. C<*.txt>) to a regex.
 
 =func unix_to_native_path($path)
 

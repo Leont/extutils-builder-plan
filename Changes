@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Add create_filter and create_subst
           - Add unix_to_native_path and native_to_unix functions to EU::B::Util
 
 0.014     2025-01-15 18:47:22+01:00 Europe/Brussels
