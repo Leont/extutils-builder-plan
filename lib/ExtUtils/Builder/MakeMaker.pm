@@ -8,6 +8,7 @@ our @ISA;
 use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
 use ExtUtils::Config::MakeMaker;
+use ExtUtils::Manifest ();
 
 sub import {
 	my ($class, @args) = @_;
@@ -56,6 +57,8 @@ sub postamble {
 		$inner->add_delegate('config', sub { $config });
 		return $inner;
 	});
+
+	$planner->add_seen($_) for sort keys %{ ExtUtils::Manifest::maniread() };
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {

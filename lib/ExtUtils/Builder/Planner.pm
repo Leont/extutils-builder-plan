@@ -156,6 +156,12 @@ sub create_subst {
 	return $name;
 }
 
+sub add_seen {
+	my ($self, $entry) = @_;
+	$self->{filesets}{'all-files'}->add_input($entry);
+	return;
+}
+
 sub add_plan {
 	my ($self, $plan) = @_;
 	$self->add_node($_) for $plan->nodes;
@@ -355,6 +361,10 @@ this sets the input fileset, it defaults to c<'all-files'>.
 this sets the name of the new set, if none is given one will be generated.
 
 =back
+
+=method add_seen($filename)
+
+This marks a file as existing on the filesystem by adding it to the C<'all-files'> fileset.
 
 =method load_module($extension, $version, %options)
 

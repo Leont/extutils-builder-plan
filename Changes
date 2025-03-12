@@ -1,7 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
-          - Add create_filter, create_pattern and create_subst
+          - Add create_filter, create_pattern, create_subst and add_seen to Planner
           - Add unix_to_native_path and native_to_unix functions to EU::B::Util
 
 0.014     2025-01-15 18:47:22+01:00 Europe/Brussels
