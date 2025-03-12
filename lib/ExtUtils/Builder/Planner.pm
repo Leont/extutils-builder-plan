@@ -162,7 +162,7 @@ sub add_seen {
 	return;
 }
 
-sub add_plan {
+sub merge_plan {
 	my ($self, $plan) = @_;
 	$self->add_node($_) for $plan->nodes;
 	return;
@@ -274,9 +274,9 @@ This marks the type of the node: C<file> or C<phony>, defaulting to the former.
 
 =back
 
-=method add_plan($plan)
+=method merge_plan($plan)
 
-This adds all nodes in the plan to the planner.
+This merges all nodes of the plan to the planner.
 
 =method add_delegate($name, $sub)
 
