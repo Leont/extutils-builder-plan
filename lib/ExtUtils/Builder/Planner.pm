@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp ();
+use File::Basename;
 use File::Spec;
 use List::Util 1.45 ();
 use Scalar::Util ();
@@ -100,6 +101,42 @@ sub create_filter {
 	my $name = $args{name} // 'filter-' . $counter++;
 	$self->{filesets}{$name} = $set;
 	return $name;
+}
+
+sub _make_pattern {
+	my ($self, %options) = @_;
+	if ($options{file}) {
+		my $file = ExtUtils::Builder::Util::glob_to_regex($options{file});
+		if ($options{dir}) {
+			my $dir = ExtUtils::Builder::Util::native_to_unix_path($options{dir});
+			return sub {
+				my ($input) = @_;
+				my $filename = ExtUtils::Builder::Util::native_to_unix_path($input);
+				$filename =~ s{(?<!/)$}{/}ms;
+				return if substr($filename, 0, length $options{dir}) ne $dir;
+				return File::Basename::basename($filename) =~ $file;
+			};
+		} else {
+			return sub {
+				my ($filename) = @_;
+				return File::Basename::basename($filename) =~ $file;
+			};
+		}
+	} elsif ($options{dir}) {
+		return sub {
+			my ($filename) = @_;
+			return substr($filename, 0, length $options{dir}) eq $options{dir};
+		};
+	} else {
+		Carp::croak("Unknown pattern type");
+	}
+}
+
+sub create_pattern {
+	my ($self, %args) = @_;
+	my $positive = $self->_make_pattern(%args);
+	my $callback = $args{negate} ? sub { !$positive->($_[0]) } : $positive;
+	return $self->create_filter(%args, condition => $callback);
 }
 
 sub create_subst {
@@ -256,6 +293,34 @@ If this callback returns true the file will be included in the new filesets.
 =item * on
 
 this sets the input fileset, it defaults to c<'all-files'>.
+
+=item * name
+
+this sets the name of the new set, if none is given one will be generated.
+
+=back
+
+=method create_pattern(%options)
+
+This is a wrapper for C<add_filter> for various common constructs. It takes several named options, at the moment at least one of C<file> or C<dir> is mandatory.
+
+=over 4
+
+=item * file
+
+A unix glob pattern that each filename is compared to, e.g. C<'*.pm'>.
+
+=item * dir
+
+The directory under which files should be (e.g. C<'lib'>).
+
+=item * negate
+
+This negates all the match.
+
+=item * on
+
+this sets the input fileset, it defaults to C<'all-files'>.
 
 =item * name
 
