@@ -4,18 +4,19 @@ use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_perl require_module command code function/;
+our @EXPORT_OK = qw/get_perl require_module unix_to_native_path native_to_unix_path command code function/;
 
 use Config;
 use ExtUtils::Config;
-use File::Spec::Functions 'file_name_is_absolute';
+use File::Spec;
+use File::Spec::Unix;
 use Scalar::Util 'tainted';
 
 sub get_perl {
 	my (%opts) = @_;
 	my $config = $opts{config} // ExtUtils::Config->new;
 
-	if (file_name_is_absolute($^X) and not tainted($^X)) {
+	if (File::Spec->file_name_is_absolute($^X) and not tainted($^X)) {
 		return $^X;
 	}
 	elsif ($config->get('userelocatableinc')) {
@@ -52,6 +53,22 @@ sub function {
 	return ExtUtils::Builder::Action::Function->new(%args);
 }
 
+sub unix_to_native_path {
+	my ($input) = @_;
+	my ($volume, $unix_dir, $file) = File::Spec::Unix->splitpath($input);
+	my @splitdir = File::Spec::Unix->splitdir($unix_dir);
+	my $catdir = File::Spec->catdir(@splitdir);
+	return File::Spec->catpath($volume, $catdir, $file);
+}
+
+sub native_to_unix_path {
+	my ($input) = @_;
+	my ($volume, $unix_dir, $file) = File::Spec->splitpath($input);
+	my @splitdir = File::Spec->splitdir($unix_dir);
+	my $catdir = File::Spec::Unix->catdir(@splitdir);
+	return File::Spec::Unix->catpath($volume, $catdir, $file);
+}
+
 1;
 
 # ABSTRACT: Utility functions for ExtUtils::Builder
@@ -71,6 +88,14 @@ This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Buil
 =func code(@command)
 
 This is a shorthand for calling L<ExtUtils::Builder::Action::Code|ExtUtils::Builder::Action::Code>'s contructor, with C<@command> passed as its C<command> argument.
+
+=func unix_to_native_path($path)
+
+This converts a unix path to a native path.
+
+=func native_to_unix_path($path)
+
+This converts a native path to a unix path.
 
 =func get_perl(%options)
 
