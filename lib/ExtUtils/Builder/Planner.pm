@@ -246,6 +246,10 @@ sub run_dsl {
 
 =head1 DESCRIPTION
 
+A Planner is an object that creates a L<Plan|ExtUtils::Builder::Plan> that can be executed.
+
+The primary objective of this class is to gather a set of nodes (triplets of target, dependencies and actions), that represent building graph. To aid building this graph, this modules provides filesets to filter and transform filenames. Delegates can be mixed into the planner to aid in building these nodes and filesets. Extensions are a collection of such delegates.
+
 =method add_node($node)
 
 This adds an L<ExtUtils::Builder::Node|ExtUtils::Builder::Node> to the planner. It will also be added to the C<'all-files'> fileset if it's a file node.
@@ -381,19 +385,26 @@ This runs C<$filename> as a DSL file. This is a script file that includes Planne
  use strict;
  use warnings;
 
- create_node(
-     target       => 'foo',
-     dependencies => [ 'bar' ],
-     actions      => [
-		command(qw/echo Hello World!/),
-		function(module => 'Foo', function => 'bar'),
-		code(code => 'print "Hello World"'),
-	 ],
- );
-
  load_module("Foo");
 
  add_foo("a.foo", "a.bar");
+
+ create_subst(
+     on    => create_pattern(file => '*.src'),
+     subst => sub {
+	     my ($source) = @_;
+		 my $target = $source =~ s/\.src$//r;
+         return create_node(
+             target       => $target,
+             dependencies => [ $source ],
+             actions      => [
+                command('convert', $target, $source),
+                function(module => 'Foo', function => 'bar'),
+                code(code => 'print "Hello World"'),
+             ],
+         );
+     },
+ );
 
 This will also add C<command>, C<function> and C<code> helper functions that correspond to L<ExtUtils::Builder::Action::Command>, L<ExtUtils::Builder::Action::Function> and L<ExtUtils::Builder::Action::Code> respectively.
 
