@@ -179,12 +179,13 @@ sub add_delegate {
 	return;
 }
 
-sub load_module {
+sub load_extension {
 	my ($self, $plannable, $version, %options) = @_;
 	ExtUtils::Builder::Util::require_module($plannable);
 	$plannable->VERSION($version) if $version;
 	return $plannable->add_methods($self, %options);
 }
+*load_module = \&load_extension;
 
 sub materialize {
 	my $self = shift;
@@ -370,9 +371,11 @@ this sets the name of the new set, if none is given one will be generated.
 
 This marks a file as existing on the filesystem by adding it to the C<'all-files'> fileset.
 
-=method load_module($extension, $version, %options)
+=method load_extension($extension, $version, %options)
 
 This adds the delegate from the given module. If C<$version> is defined it will verify if the extension is at least that version.
+
+C<load_module> is a depreciated alias for this function.
 
 =method new_scope()
 
@@ -385,7 +388,7 @@ This runs C<$filename> as a DSL file. This is a script file that includes Planne
  use strict;
  use warnings;
 
- load_module("Foo");
+ load_extension("Foo");
 
  add_foo("a.foo", "a.bar");
 
@@ -415,5 +418,6 @@ This returns a new L<ExtUtils::Builder::Plan|ExtUtils::Builder::Plan> object bas
 =begin Pod::Coverage
 
 new
+load_module
 
 =end Pod::Coverage
