@@ -123,8 +123,11 @@ sub _make_pattern {
 			};
 		}
 	} elsif ($options{dir}) {
+		my $dir = ExtUtils::Builder::Util::native_to_unix_path($options{dir});
 		return sub {
-			my ($filename) = @_;
+			my ($input) = @_;
+			my $filename = ExtUtils::Builder::Util::native_to_unix_path($input);
+			$filename =~ s{(?<!/)$}{/}ms;
 			return substr($filename, 0, length $options{dir}) eq $options{dir};
 		};
 	} else {
