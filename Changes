@@ -2,6 +2,8 @@ Revision history for ExtUtils-Builder
 
 {{$NEXT}}
 
+0.016     2025-03-30 12:23:45+02:00 Europe/Brussels
+
           - Rename load_module to load_extension
           - Normalize directory pattern without file pattern too
 
