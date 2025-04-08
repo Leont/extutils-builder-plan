@@ -112,6 +112,68 @@ sub postamble {
 
 This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files, these are run in a new scope so delegates don't leak out. Entries may depend on existing MakeMaker entries and vice-versa. Typically one would make their target a dependency of a MakeMaker entry like C<pure_all> or C<dynamic>.
 
+=head1 DELEGATES
+
+By default, the following delegates are defined on your L<planner|ExtUtils::Builder::Planner>:
+
+=over 4
+
+=item * meta
+
+A L<CPAN::Meta|CPAN::Meta> object representing the C<META.json> file.
+
+=item * distribution
+
+The name of the distribution
+
+=item * version
+
+The version of the distribution
+
+=item * main_module
+
+The main module of the distribution.
+
+=item * release_status
+
+The release status of the distribution (e.g. C<'stable'>).
+
+=item * perl_path
+
+The path to the perl executable.
+
+=item * config
+
+The L<ExtUtils::Config::MakeMaker|ExtUtils::Config::MakeMaker> object for this build
+
+=item * is_os(@os_names)
+
+This returns true if the current operating system matches any of the listed ones.
+
+=item * is_os_type($os_type)
+
+This returns true if the type of the OS matches C<$os_type>. Legal values are C<Unix>, C<Windows> and C<VMS>.
+
+=item * verbose
+
+This is always false.
+
+=item * uninst
+
+The value of the C<uninst> command line argument.
+
+=item * jobs
+
+This is always C<1>.
+
+=item * pureperl_only
+
+The value of the C<PUREPERL_ONLY> command line argument.
+
+=back
+
+These are the same ones as L<Dist::Build> sets except C<install_paths> is missing.
+
 =begin Pod::Coverage
 
 postamble
