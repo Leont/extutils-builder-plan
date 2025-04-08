@@ -22,25 +22,30 @@ my $class_counter = 0;
 sub new {
 	my $base_class = shift;
 	my $all_files = ExtUtils::Builder::FileSet::Free->new;
-	return $base_class->_new_scope($base_class, {}, { 'all-files' => $all_files });
+	return $base_class->_new_scope($base_class, undef, {}, { 'all-files' => $all_files });
 }
 
 sub _new_scope {
-	my ($self, $base_class, $nodes, $filesets) = @_;
+	my ($self, $base_class, $outer, $nodes, $filesets) = @_;
 
 	my $class = __PACKAGE__ . '::Anon_' . ++$class_counter;
 	no strict 'refs';
 	push @{ "$class\::ISA" }, $base_class;
 
-	bless {
+	my $new = bless {
 		nodes    => $nodes,
 		filesets => $filesets
 	}, $class;
+
+	$new->add_delegate('self', sub { $new });
+	$new->add_delegate('outer', sub { $outer });
+
+	return $new;
 }
 
 sub new_scope {
 	my ($self) = @_;
-	return $self->_new_scope(ref($self), $self->{nodes}, $self->{filesets});
+	return $self->_new_scope(ref($self), $self, $self->{nodes}, $self->{filesets});
 }
 
 sub add_node {
@@ -417,6 +422,14 @@ This will also add C<command>, C<function> and C<code> helper functions that cor
 =method materialize()
 
 This returns a new L<ExtUtils::Builder::Plan|ExtUtils::Builder::Plan> object based on the planner.
+
+=method self()
+
+This returns the planner.
+
+=method outer()
+
+This returns the planner matching the outer scope of the current planner object.
 
 =begin Pod::Coverage
 

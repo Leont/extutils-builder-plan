@@ -73,10 +73,7 @@ sub postamble {
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
-		my $inner = $planner->new_scope;
-		$inner->add_delegate('self', sub { $inner });
-		$inner->add_delegate('outer', sub { $planner });
-		$inner->run_dsl($file);
+		$planner->new_scope->run_dsl($file);
 	}
 
 	my $plan = $planner->materialize;
