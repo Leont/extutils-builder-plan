@@ -9,6 +9,7 @@ use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
 use ExtUtils::Config::MakeMaker;
 use ExtUtils::Manifest ();
+use version ();
 
 sub import {
 	my ($class, @args) = @_;
@@ -43,7 +44,7 @@ sub postamble {
 	my $config = ExtUtils::Config::MakeMaker->new($maker);
 	$planner->add_delegate('config', sub { $config });
 	$planner->add_delegate('distribution', sub { $maker->{DIST_NAME} });
-	$planner->add_delegate('distribution_version', sub { $maker->{VERSION} });
+	$planner->add_delegate('version', sub { version->new($maker->{VERSION}) });
 	$planner->add_delegate('main_module', sub { $maker->{NAME} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
 	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
