@@ -52,6 +52,16 @@ sub postamble {
 	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });
 	$planner->add_delegate('jobs', sub { 1 });
 
+	$planner->add_delegate('is_os', sub {
+		my ($self, @wanted) = @_;
+		return not not grep { $_ eq $^O } @wanted
+	});
+	$planner->add_delegate('is_os_type', sub {
+		my ($self, $wanted) = @_;
+		require Perl::OSType;
+		return Perl::OSType::is_os_type($wanted);
+	});
+
 	$planner->add_delegate('new_planner', sub {
 		my $inner = ExtUtils::Builder::Planner->new;
 		$inner->add_delegate('config', sub { $config });
