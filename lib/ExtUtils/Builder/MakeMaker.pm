@@ -48,6 +48,7 @@ sub postamble {
 	$planner->add_delegate('main_module', sub { $maker->{NAME} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
 	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
+	$planner->add_delegate('verbose', sub { !!0 });
 	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
 	$planner->add_delegate('meta', sub { CPAN::Meta->load_file('META.json') });
 	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });

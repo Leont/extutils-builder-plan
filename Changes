@@ -4,6 +4,7 @@ Revision history for ExtUtils-Builder
           - Add is_os and is_os_type delegates in EU::B::MakeMaker
           - Rename distribution_version to version in EU::B::MakeMaker
           - Add self and outer methods to all planners
+          - Add verbose stub delegate to EU::B::MakeMaker
 
 0.016     2025-03-30 12:23:45+02:00 Europe/Brussels
 
