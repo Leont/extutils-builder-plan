@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Add split_like_shell to ExtUtils::Builder::Util
 
 0.017     2025-04-09 10:19:14+02:00 Europe/Brussels
           - Add is_os and is_os_type delegates in EU::B::MakeMaker

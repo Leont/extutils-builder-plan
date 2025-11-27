@@ -4,11 +4,12 @@ use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_perl require_module unix_to_native_path native_to_unix_path command code function/;
+our @EXPORT_OK = qw/get_perl require_module unix_to_native_path native_to_unix_path command code function split_like_shell/;
 
 use Carp 'croak';
 use Config;
 use ExtUtils::Config;
+use ExtUtils::Helpers 0.027 'split_like_shell';
 use File::Spec;
 use File::Spec::Unix;
 use Scalar::Util 'tainted';
@@ -176,3 +177,7 @@ An L<ExtUtils::Config|ExtUtils::Config> (compatible) object.
 =func require_module($module)
 
 Dynamically require a module.
+
+=func split_like_shell($string)
+
+This function splits a string the same way as the local platform does.
