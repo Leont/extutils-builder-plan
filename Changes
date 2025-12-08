@@ -1,6 +1,7 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+          - Correctly get perlpath when $^X is not absolute
 
 0.018     2025-11-27 23:05:27+01:00 Europe/Brussels
           - Add split_like_shell to ExtUtils::Builder::Util

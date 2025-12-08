@@ -26,7 +26,7 @@ sub get_perl {
 		return Devel::FindPerl::find_perl_interpreter($config);
 	}
 	else {
-		return $opts{config}->get('perlpath');
+		return $config->get('perlpath');
 	}
 }
 
