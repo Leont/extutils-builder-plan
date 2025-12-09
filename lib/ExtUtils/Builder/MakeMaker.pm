@@ -42,6 +42,7 @@ sub postamble {
 
 	my $planner = ExtUtils::Builder::Planner->new;
 	$planner->add_delegate('makemaker', sub { $maker });
+	$planner->load_extension('ExtUtils::Builder::CPAN::Tool');
 	my $config = ExtUtils::Config::MakeMaker->new($maker);
 	$planner->add_delegate('config', sub { $config });
 	$planner->add_delegate('distribution', sub { $maker->{DIST_NAME} });
@@ -49,27 +50,7 @@ sub postamble {
 	$planner->add_delegate('main_module', sub { $maker->{NAME} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
 	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
-	$planner->add_delegate('verbose', sub { !!0 });
 	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
-	$planner->add_delegate('meta', sub { CPAN::Meta->load_file('META.json') });
-	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });
-	$planner->add_delegate('jobs', sub { 1 });
-
-	$planner->add_delegate('is_os', sub {
-		my ($self, @wanted) = @_;
-		return not not grep { $_ eq $^O } @wanted
-	});
-	$planner->add_delegate('is_os_type', sub {
-		my ($self, $wanted) = @_;
-		require Perl::OSType;
-		return Perl::OSType::is_os_type($wanted);
-	});
-
-	$planner->add_delegate('new_planner', sub {
-		my $inner = ExtUtils::Builder::Planner->new;
-		$inner->add_delegate('config', sub { $config });
-		return $inner;
-	});
 
 	$planner->add_seen(unix_to_native_path($_)) for sort keys %{ ExtUtils::Manifest::maniread() };
 
@@ -115,7 +96,7 @@ This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUti
 
 =head1 DELEGATES
 
-By default, the following delegates are defined on your L<planner|ExtUtils::Builder::Planner>:
+This will define all delegates of L<ExtUtils::Builder::CPAN::Tool> in your L<planner|ExtUtils::Builder::Planner>:
 
 =over 4
 

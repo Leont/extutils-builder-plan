@@ -4,6 +4,7 @@ Revision history for ExtUtils-Builder
           - Correctly get perlpath when $^X is not absolute
           - Don't accidentally pattern match files with names similar to the dir
           - Transform paths from MakeMaker to native for Planner
+          - Add ExtUtils::Builder::CPAN::Tool
 
 0.018     2025-11-27 23:05:27+01:00 Europe/Brussels
           - Add split_like_shell to ExtUtils::Builder::Util
