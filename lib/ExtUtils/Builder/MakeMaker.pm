@@ -7,6 +7,7 @@ our @ISA;
 
 use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
+use ExtUtils::Builder::Util 'unix_to_native_path';
 use ExtUtils::Config::MakeMaker;
 use ExtUtils::Manifest ();
 use version ();
@@ -70,7 +71,7 @@ sub postamble {
 		return $inner;
 	});
 
-	$planner->add_seen($_) for sort keys %{ ExtUtils::Manifest::maniread() };
+	$planner->add_seen(unix_to_native_path($_)) for sort keys %{ ExtUtils::Manifest::maniread() };
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
