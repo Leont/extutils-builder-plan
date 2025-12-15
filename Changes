@@ -1,6 +1,8 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+
+0.019     2025-12-15 12:43:33+01:00 Europe/Brussels
           - Correctly get perlpath when $^X is not absolute
           - Don't accidentally pattern match files with names similar to the dir
           - Transform paths from MakeMaker to native for Planner
