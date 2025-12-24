@@ -1,0 +1,15 @@
+runtime:
+  requires:
+    perl: 5.010
+    CPAN::Meta: 0
+    ExtUtils::Config: 0.009
+    ExtUtils::Helpers: 0.027
+    ExtUtils::MakeMaker: 6.68
+    List::Util: 1.45
+    Perl::OSType: 0
+    parent: 0
+  recommends:
+    Sub::Util: 1.40
+test:
+  requires:
+    Test::More: 0.89
