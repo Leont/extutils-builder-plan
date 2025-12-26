@@ -22,9 +22,6 @@ sub add_methods {
 	$planner->add_delegate('distribution', sub {
 		return $_[0]->meta->name;
 	});
-	$planner->add_delegate('release_status', sub {
-		return $_[0]->meta->release_status;
-	});
 	$planner->add_delegate('version', sub {
 		return version->new($_[0]->meta->version);
 	});
@@ -105,10 +102,6 @@ The version of the distribution (as a version object).
 =head2 main_module
 
 The main module of the distribution.
-
-=head2 release_status
-
-The release status of the distribution (e.g. C<'stable'>).
 
 =head2 perl_path
 

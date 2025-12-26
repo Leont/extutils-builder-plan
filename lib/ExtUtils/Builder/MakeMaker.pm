@@ -116,10 +116,6 @@ The version of the distribution
 
 The main module of the distribution.
 
-=item * release_status
-
-The release status of the distribution (e.g. C<'stable'>).
-
 =item * perl_path
 
 The path to the perl executable.
