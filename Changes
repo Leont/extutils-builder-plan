@@ -2,6 +2,7 @@ Revision history for ExtUtils-Builder
 
 {{$NEXT}}
           - Remove release_status delegate
+          - Fix off-by-one in directory matching
 
 0.019     2025-12-15 12:43:33+01:00 Europe/Brussels
           - Correctly get perlpath when $^X is not absolute

@@ -118,7 +118,7 @@ sub _make_pattern {
 			return sub {
 				my ($input) = @_;
 				my $filename = ExtUtils::Builder::Util::native_to_unix_path($input);
-				return if substr($filename, 0, length $options{dir}) ne $dir;
+				return if substr($filename, 0, length $dir) ne $dir;
 				return File::Basename::basename($filename) =~ $file;
 			};
 		} else {
@@ -133,7 +133,7 @@ sub _make_pattern {
 		return sub {
 			my ($input) = @_;
 			my $filename = ExtUtils::Builder::Util::native_to_unix_path($input);
-			return substr($filename, 0, length $options{dir}) eq $options{dir};
+			return substr($filename, 0, length $dir) eq $dir;
 		};
 	} else {
 		Carp::croak("Unknown pattern type");
