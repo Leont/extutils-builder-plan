@@ -1,6 +1,8 @@
 Revision history for ExtUtils-Builder
 
 {{$NEXT}}
+
+0.020     2026-02-21 13:52:46+01:00 Europe/Brussels
           - Remove release_status delegate
           - Fix off-by-one in directory matching
           - Rewrite main module documentation
